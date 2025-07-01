@@ -1,0 +1,18 @@
+[
+  {
+    "id": "USR001",
+    "nama": "Ridho Ilahi",
+    "email": "ridho@gmail.com",
+    "no_hp": "08123456789",
+    "jabatan": "IT Support",
+    "status": "Aktif"
+  },
+  {
+    "id": "USR002",
+    "nama": "Farhan Yusuf",
+    "email": "farhan@mail.com",
+    "no_hp": "08987654321",
+    "jabatan": "Admin",
+    "status": "Nonaktif"
+  }
+]

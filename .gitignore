@@ -1,0 +1,27 @@
+# Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtualenv
+env/
+
+# Database file (jika pakai SQLite)
+db.sqlite3
+
+# Django
+*.log
+*.pot
+*.py[cod]
+
+# Environment variables
+.env
+
+# Static files
+staticfiles/
+
+# Media files (file upload)
+media/
+
+celerybeat-schedule
+

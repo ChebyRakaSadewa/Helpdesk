@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/user.css" />
+  <!-- link untuk icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <title>IT-helpdesk</title>
+  <link rel="icon" href="img/logoweb.png" type="image/png" />
+</head>
+
+<body>
+  <!-- Toggle button buat mobile -->
+  <button id="sidebarCollapseMobile" class="btn d-lg-none">
+    <i class="bi bi-list"></i>
+  </button>
+  <div class="wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar-placeholder"></div>
+    <script>
+      // Script buat load sidebar
+      fetch("sidebar_admin.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("sidebar-placeholder").innerHTML = data;
+
+          // === Tambahkan script toggle sidebar di sini ===
+          document.getElementById('sidebarCollapseMobile')?.addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+          });
+
+          document.getElementById('sidebarCollapse')?.addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+          });
+        });
+    </script>
+    <!-- akhir sidebar -->
+    <!-- ini untuk konten -->
+    <div class="main-content">
+      <!-- tempat navbar -->
+      <div id="navbar-placeholder"></div>
+      <!-- akhir dari navbar -->
+
+      <!-- Cards -->
+      <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <button class="tab-button active" onclick="switchTab('members')">Members</button>
+            <button class="tab-button" onclick="switchTab('admins')">Admins</button>
+          </div>
+          <div>
+            <span id="total-admin">0</span> Admin | <span id="total-user">0</span> User
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+          <h4 id="section-title">Members</h4>
+          <div>
+            <!-- Tombol Add New -->
+            <button class="btn btn-primary btn-sm" id="addUserBtn">Add New</button>
+            <button class="btn btn-outline-suc btn-sm" id="exportExcelBtn">Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="table-light">
+              <tr>
+                <th></th>
+                <th>Nama</th>
+                <th>Kontak</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Status</th>
+                <th>Operation</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="user-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- akhir dari konten  -->
+
+  <!-- Modal Add/Edit User -->
+  <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addUserModalLabel">Add Member</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addUserForm" enctype="multipart/form-data">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" name="fullname" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">No Telepon</label>
+                <input type="text" class="form-control" name="no_hp" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" name="alamat">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Office Branch</label>
+                <select class="form-select" name="office_branch">
+                  <option value="">Select Branch</option>
+                  <option value="Jakarta">Jakarta</option>
+                  <option value="Bandung">Bandung</option>
+                  <option value="Surabaya">Surabaya</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Admin/User</label>
+                <select class="form-select" name="is_admin">
+                  <option value="true">Admin</option>
+                  <option value="false">User</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Jabatan</label>
+                <select class="form-select" name="jabatan">
+                  <option value="">Select Job Title</option>
+                  <option value="Partner">CEO</option>
+                  <option value="MIC">Manager</option>
+                  <option value="IC">IC</option>
+                  <option value="SeniorAudit">Senior Audit</option>
+                  <option value="JuniorAudit">Junior Audit</option>
+                  <option value="AsistenAudit">Asisten Audit</option>
+                  <option value="Pajak">Pajak</option>
+                  <option value="Keuangan">Keuangan</option>
+                  <option value="HRD">HRD</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="gender" id="genderOptions">
+                  <option value="L">Laki-laki</option>
+                  <option value="P">Perempuan</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" class="form-control" name="ttl" required>
+              </div>
+              <div class="col">
+                <label class="form-label">Age</label>
+                <input type="text" class="form-control" id="calculated-age" disabled />
+              </div>
+              <div class="col-md-12">
+                <label class="form-label">Upload Photo</label>
+                <input type="file" class="form-control" name="foto">
+              </div>
+            </div>
+            <div class="mt-4 text-end">
+              <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal View User -->
+  <div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detail User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="viewUserContent">
+          <!-- Konten akan diisi lewat JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script utama user -->
+  <script>
+    let allUsers = [];
+    let currentTab = 'members';
+
+    function renderUsers(users) {
+      const tableBody = document.getElementById('user-table-body');
+      tableBody.innerHTML = '';
+
+      users.forEach(user => {
+        tableBody.innerHTML += `
+          <tr>
+            <td><img class="profile-img" src="${user.foto_url || ''}" alt=""></td>
+            <td>${user.fullname || '-'}</td>
+            <td>${user.no_hp || '-'}</td>
+            <td>${user.email || '-'}</td>
+            <td>${user.username || '-'}</td>
+            <td>
+              <span class="${user.is_admin ? 'status-active' : 'status-inactive'}">
+                ${user.is_admin ? 'Admin' : 'User'}
+              </span>
+            </td>
+            <td class="operation-icons">
+              <i class="fas fa-eye text-info view-btn" data-id="${user.id}"></i>
+              <i class="fas fa-edit text-primary edit-btn" data-id="${user.id}"></i>
+              <i class="fas fa-trash text-danger delete-btn" data-id="${user.id}"></i>
+            </td>
+            <td><button class="btn btn-sm btn-primary">Login</button></td>
+          </tr>
+        `;
+      });
+
+      // Update total admin/user dari allUsers
+      document.getElementById('total-admin').textContent = allUsers.filter(u => u.is_admin).length;
+      document.getElementById('total-user').textContent = allUsers.filter(u => !u.is_admin).length;
+
+      addEventListeners();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.tab-button[onclick="switchTab('${tab}')"]`).classList.add('active');
+      document.getElementById('section-title').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
+
+      let filtered = [];
+      if (tab === 'members') {
+        filtered = allUsers.filter(u => !u.is_admin);
+      } else if (tab === 'admins') {
+        filtered = allUsers.filter(u => u.is_admin);
+      }
+      renderUsers(filtered);
+    }
+
+    function loadUsers() {
+      fetch('http://127.0.0.1:8000/api/users/', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          allUsers = Array.isArray(data) ? data : (data.results || []);
+          switchTab(currentTab);
+        });
+    }
+
+    // Event listener tombol Add
+    document.addEventListener('DOMContentLoaded', function () {
+      // Tombol Add New
+      document.getElementById('addUserBtn').addEventListener('click', function () {
+        const form = document.getElementById('addUserForm');
+        form.reset();
+        form.querySelector('[name="id"]')?.remove();
+        // Ubah judul modal jadi "Add Member"
+        document.getElementById('addUserModalLabel').textContent = 'Add Member';
+        const modalEl = document.getElementById('addUserModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+      });
+
+      // Jalankan loadUsers saat halaman siap
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get('type') || 'members';
+      currentTab = type;
+      loadUsers();
+    });
+
+    // Dummy addEventListeners (isi sesuai kebutuhanmu)
+    function addEventListeners() {
+      // 🖊️ Tombol edit
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = this.dataset.id;
+          fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+          })
+            .then(res => res.json())
+            .then(data => {
+              const form = document.getElementById('addUserForm');
+              form.username.value = data.username || '';
+              form.email.value = data.email || '';
+              form.no_hp.value = data.no_hp || '';
+              form.alamat.value = data.alamat || '';
+              form.office_branch.value = data.office_branch || '';
+              form.is_admin.value = data.is_admin ? "true" : "false";
+              form.jabatan.value = data.jabatan || '';
+              form.password.value = '';
+              form.gender.value = data.gender || '';
+              form.ttl.value = data.ttl || '';
+              form.fullname.value = data.fullname || '';
+              let hiddenInput = form.querySelector('[name="id"]');
+              if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'id';
+                form.appendChild(hiddenInput);
+              }
+              hiddenInput.value = data.id;
+              // Ubah judul modal jadi "Edit Member"
+              document.getElementById('addUserModalLabel').textContent = 'Edit Member';
+              const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addUserModal'));
+              modal.show();
+            });
+        });
+      });
+
+      // 🗑️ Tombol delete
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = this.dataset.id;
+          const confirmDelete = confirm("Yakin mau hapus data ini?");
+          if (confirmDelete) {
+            fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+            })
+              .then(res => {
+                if (res.ok) {
+                  alert('User berhasil dihapus!');
+                  loadUsers();
+                } else {
+                  alert('Gagal hapus user!');
+                }
+              });
+          }
+        });
+      });
+
+      // 👁️ Tombol view
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const userId = this.dataset.id;
+          fetch(`http://127.0.0.1:8000/api/users/${userId}/`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+          })
+            .then(res => res.json())
+            .then(data => {
+              const html = `
+                <p><strong>Username:</strong> ${data.username}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>No HP:</strong> ${data.no_hp}</p>
+                <p><strong>Jabatan:</strong> ${data.jabatan}</p>
+                <p><strong>Status:</strong> ${data.is_admin ? 'Admin' : 'User'}</p>
+              `;
+              document.getElementById('viewUserContent').innerHTML = html;
+              const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('viewUserModal'));
+              modal.show();
+            });
+        });
+      });
+    }
+
+    document.getElementById('addUserForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const userId = form.querySelector('[name="id"]')?.value;
+
+      // Password wajib diisi saat add user
+      if (!userId && !form.password.value) {
+        alert('Password wajib diisi untuk user baru!');
+        form.password.focus();
+        return;
+      }
+
+      // Ubah is_admin ke boolean string
+      if (formData.has('is_admin')) {
+        formData.set('is_admin', formData.get('is_admin') === 'true');
+      }
+
+      // Jangan kirim password/foto kosong saat edit
+      if (userId && !form.password.value) formData.delete('password');
+      if (userId && !form.foto.value) formData.delete('foto');
+
+      const url = userId
+        ? `http://127.0.0.1:8000/api/users/${userId}/`
+        : 'http://127.0.0.1:8000/api/register/';
+      const method = userId ? 'PATCH' : 'POST';
+
+      fetch(url, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: formData
+      })
+        .then(res => res.json().then(data => ({status: res.status, body: data})))
+        .then(({status, body}) => {
+          if (status === 200 || status === 201) {
+            alert('User berhasil disimpan!');
+            form.reset();
+            form.querySelector('[name="id"]')?.remove();
+            const modalEl = document.getElementById('addUserModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.hide();
+            loadUsers();
+          } else {
+            alert('Gagal menyimpan user!');
+            console.error(body);
+          }
+        })
+        .catch(error => {
+          alert('Terjadi kesalahan saat menyimpan!');
+          console.error(error);
+        });
+    });
+  </script>
+
+  <!-- ini buat ngitung umur otomatis bedasarkan pilihan tanggal  -->
+  <script>
+    function calculateAge(ttl) {
+      const birthDate = new Date(ttl);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const ttlInput = document.querySelector('input[name="ttl"]');
+      const ageInput = document.getElementById("calculated-age");
+
+      if (ttlInput && ageInput) {
+        ttlInput.addEventListener("change", function () {
+          const age = calculateAge(this.value);
+          ageInput.value = isNaN(age) ? "" : age + " tahuns";
+        });
+      }
+    });
+  </script>
+
+
+  <!-- Bootstrap 5 JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Litepicker -->
+  <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
+  <!-- CDN Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const exportBtn = document.getElementById('exportExcelBtn');
+      if (exportBtn) {
+        exportBtn.addEventListener('click', function () {
+          // Ambil data user dari tabel (atau dari variabel JS jika ada)
+          let dataToExport = [];
+          if (typeof allUsers !== "undefined" && typeof currentTab !== "undefined") {
+            if (currentTab === 'members') {
+              dataToExport = allUsers.filter(u => !u.is_admin);
+            } else if (currentTab === 'admins') {
+              dataToExport = allUsers.filter(u => u.is_admin);
+            } else {
+              dataToExport = allUsers;
+            }
+          } else {
+            alert('Data user tidak ditemukan!');
+            return;
+          }
+
+          const exportData = dataToExport.map(user => ({
+            Nama: user.fullname || '',
+            Kontak: user.no_hp || '',
+            Email: user.email || '',
+            Username: user.username || '',
+            Status: user.is_admin ? 'Admin' : 'User',
+            Jabatan: user.jabatan || '',
+            Branch: user.office_branch || '',
+            Gender: user.gender || '',
+            'Tanggal Lahir': user.ttl || ''
+          }));
+
+          if (exportData.length === 0) {
+            alert('Tidak ada data untuk diexport!');
+            return;
+          }
+
+          const ws = XLSX.utils.json_to_sheet(exportData);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Users");
+          XLSX.writeFile(wb, "users.xlsx");
+        });
+      }
+    });
+  </script>
+
+  <script>
+fetch("navbar.html")
+  .then((res) => res.text())
+  .then((data) => {
+    document.getElementById("navbar-placeholder").innerHTML = data;
+
+    // Fetch user dan update profil
+    fetch('http://127.0.0.1:8000/api/me/', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+    })
+      .then(res => res.json())
+      .then(user => {
+        // Update semua elemen foto profil (navbar & modal)
+        document.querySelectorAll('#profileFoto, #profileFotoModal').forEach(img => {
+          img.src = user.foto_url ? user.foto_url : 'img/default.png';
+        });
+        document.getElementById('userName').textContent = user.fullname || '-';
+        document.getElementById('profileFullname').textContent = user.fullname || '-';
+        document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+        document.getElementById('profileUsername').textContent = user.username || '-';
+        document.getElementById('profileEmail').textContent = user.email || '-';
+        document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+        document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+        document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+        document.getElementById('profileAlamat').textContent = user.alamat || '-';
+        document.getElementById('profileBranch').textContent = user.office_branch || '-';
+
+        // Isi form edit profile
+        document.getElementById('editFullname').value = user.fullname || '';
+        document.getElementById('editEmail').value = user.email || '';
+        document.getElementById('editNoHp').value = user.no_hp || '';
+        document.getElementById('editGender').value = user.gender || '';
+        document.getElementById('editAlamat').value = user.alamat || '';
+        if (document.getElementById('editBranch')) {
+          document.getElementById('editBranch').value = user.office_branch || '';
+        }
+      });
+
+    // Event listener buka modal profile
+    const profileImg = document.getElementById('profileFoto');
+    if (profileImg) {
+      profileImg.addEventListener('click', function () {
+        const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+        profileModal.show();
+      });
+    }
+
+    // Event listener edit profile
+    const editProfileForm = document.getElementById('editProfileForm');
+    if (editProfileForm) {
+      editProfileForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Ambil value form
+        const fullname = document.getElementById('editFullname').value;
+        const email = document.getElementById('editEmail').value;
+        const no_hp = document.getElementById('editNoHp').value;
+        const gender = document.getElementById('editGender').value;
+        const alamat = document.getElementById('editAlamat').value;
+        const office_branch = document.getElementById('editBranch').value;
+        const fotoInput = document.getElementById('editFoto');
+
+        // Ambil value lama dari tampilan profile
+        const oldFullname = document.getElementById('profileFullname').textContent;
+        const oldEmail = document.getElementById('profileEmail').textContent;
+        const oldNoHp = document.getElementById('profileNoHp').textContent;
+        const oldGender = document.getElementById('profileGender').textContent === 'Laki-laki' ? 'L' : (document.getElementById('profileGender').textContent === 'Perempuan' ? 'P' : '');
+        const oldAlamat = document.getElementById('profileAlamat').textContent;
+        const oldBranch = document.getElementById('profileBranch').textContent;
+
+        // Cek apakah ada perubahan (atau upload foto baru)
+        const isChanged =
+          fullname !== oldFullname ||
+          email !== oldEmail ||
+          no_hp !== oldNoHp ||
+          gender !== oldGender ||
+          alamat !== oldAlamat ||
+          office_branch !== oldBranch ||
+          (fotoInput && fotoInput.files.length > 0);
+
+        if (!isChanged) {
+          showNotif('Tidak ada perubahan data.', false);
+          return; // <-- Penting! Hentikan eksekusi jika tidak ada perubahan
+        }
+
+        // Kode PATCH update profile di bawah sini
+        const token = localStorage.getItem('access_token');
+        const formData = new FormData(this);
+        if (fotoInput && !fotoInput.files.length) {
+          formData.delete('foto');
+        }
+
+        fetch('http://127.0.0.1:8000/api/me/', {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        })
+          .then(res => {
+            if (!res.ok) throw new Error('Gagal update profile');
+            return res.json();
+          })
+          .then(user => {
+            // Update semua tampilan profile
+            document.getElementById('userName').textContent = user.fullname || '-';
+            document.getElementById('profileFullname').textContent = user.fullname || '-';
+            document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+            document.getElementById('profileUsername').textContent = user.username || '-';
+            document.getElementById('profileEmail').textContent = user.email || '-';
+            document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+            document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+            document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+            document.getElementById('profileAlamat').textContent = user.alamat || '-';
+            document.getElementById('profileBranch').textContent = user.office_branch || '-';
+            document.getElementById('profileFoto').src = user.foto_url ? user.foto_url : 'img/default.png';
+
+            // Tutup modal
+            const editModalEl = document.getElementById('editProfileModal');
+            if (editModalEl) {
+              let editModal = bootstrap.Modal.getInstance(editModalEl);
+              if (!editModal) {
+                editModal = new bootstrap.Modal(editModalEl);
+              }
+              editModal.hide();
+            }
+            showNotif('Profile berhasil diupdate!', true);
+          })
+          .catch(err => {
+            showNotif('Gagal update profile: ' + err.message, false);
+          });
+      });
+    }
+
+    // Event listener logout di modal profile
+    const logoutBtnModal = document.getElementById('logoutBtnModal');
+    if (logoutBtnModal) {
+      logoutBtnModal.addEventListener('click', function (e) {
+        e.preventDefault();
+        localStorage.removeItem('access_token');
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+      });
+    }
+  });
+</script>
+
+<script>
+function showNotif(message, success = true) {
+  document.querySelectorAll('.alert-dismissible').forEach(el => el.remove());
+  const notifCard = document.createElement('div');
+  notifCard.className = `alert alert-${success ? 'success' : 'danger'} alert-dismissible fade show position-fixed start-50 translate-middle-x mt-3`;
+  notifCard.style.top = '30px';
+  notifCard.style.left = '50%';
+  notifCard.style.zIndex = 2000;
+  notifCard.style.minWidth = '300px';
+  notifCard.style.maxWidth = '90vw';
+  notifCard.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  document.body.appendChild(notifCard);
+  setTimeout(() => {
+    notifCard.classList.remove('show');
+    notifCard.classList.add('hide');
+    setTimeout(() => notifCard.remove(), 500);
+  }, 3000);
+}
+</script>
+</body>
+
+</html>

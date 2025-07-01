@@ -1,0 +1,5 @@
+[
+  { "id": 1, "judul": "Printer error", "status": "open" },
+  { "id": 2, "judul": "Jaringan bermasalah", "status": "done" },
+  { "id": 3, "judul": "Request install software", "status": "progress" }
+]

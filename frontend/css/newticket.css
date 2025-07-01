@@ -1,0 +1,72 @@
+:root {
+  --warna-bg: #00333A;
+  --warna-bg1: #f5faf9;
+  --warna-primer: #00e1ff;
+  --warna-sekunder: #ffc107;
+  --warna-teks: #212529;
+
+  --font-size-body: 14px;
+  --font-size-title: 18px;
+  --font-size-subtitle: 16px;
+  --font-size-small: 12px;
+  --font-size-sidebar: 14px;
+
+  --font-utama: 'Roboto', 'Open Sans', sans-serif;
+  --font-judul: 'Poppins', sans-serif;
+}
+
+.card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.wrapper {
+  display: flex;
+  background:var(--warna-bg1);
+
+}
+
+
+
+
+.main-content {
+  flex-grow: 1;
+ 
+}
+.card {
+  max-width: 10000px;
+  margin: 0 auto;
+}
+
+.card-body .btn {
+  background:#00333A;
+  color:#fff;  
+  box-shadow:2rem; 
+  width:15rem;
+}
+.card-body .btn:hover{
+  background:#fff;
+  color:black;
+  border-color:#00333A;
+  box-shadow:19px;
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3); /* Ubah dari 0.8 ke 0.3 (lebih transparan) */
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px); /* Tambahan: biar belakang agak blur */
+}
+
+.svg-loader {
+  width: 100px;
+  height: 100px;
+}
+

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/newticket.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <title>IT-helpdesk</title>
+  <link rel="icon" href="img/logoweb.png" type="image/png" />
+</head>
+
+<body>
+  <!-- Toggle button untuk mobile -->
+  <button id="sidebarCollapseMobile" class="btn d-lg-none">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <div class="wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar-placeholder"></div>
+    <script>
+      fetch('http://127.0.0.1:8000/api/me/', {
+  headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+})
+  .then(res => res.json())
+  .then(user => {
+    const sidebarFile = user.is_admin ? "sidebar_admin.html" : "sidebar_admin.html";
+    fetch(sidebarFile)
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("sidebar-placeholder").innerHTML = data;
+        // Toggle sidebar
+        document.getElementById('sidebarCollapseMobile')?.addEventListener('click', function () {
+          document.getElementById('sidebar').classList.toggle('active');
+        });
+        document.getElementById('sidebarCollapse')?.addEventListener('click', function () {
+          document.getElementById('sidebar').classList.toggle('active');
+        });
+      });
+  });
+    </script>
+    <!-- End Sidebar -->
+
+    <!-- Konten -->
+    <div class="main-content">
+      <!-- Navbar -->
+      <div id="navbar-placeholder"></div>
+      <script>
+        // Script untuk load navbar dan event handler terkait
+        fetch("navbar.html")
+          .then((res) => res.text())
+          .then((data) => {
+            document.getElementById("navbar-placeholder").innerHTML = data;
+
+            // Fetch user dan update profil
+            fetch('http://127.0.0.1:8000/api/me/', {
+              headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+            })
+              .then(res => res.json())
+              .then(user => {
+                // Update semua elemen foto profil (navbar & modal)
+                document.querySelectorAll('#profileFoto, #profileFotoModal').forEach(img => {
+                  img.src = user.foto_url ? user.foto_url : 'img/default.png';
+                });
+                document.getElementById('userName').textContent = user.fullname || '-';
+                document.getElementById('profileFullname').textContent = user.fullname || '-';
+                document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+                document.getElementById('profileUsername').textContent = user.username || '-';
+                document.getElementById('profileEmail').textContent = user.email || '-';
+                document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+                document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+                document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+                document.getElementById('profileAlamat').textContent = user.alamat || '-';
+                document.getElementById('profileBranch').textContent = user.office_branch || '-';
+
+                // Isi form edit profile
+                document.getElementById('editFullname').value = user.fullname || '';
+                document.getElementById('editEmail').value = user.email || '';
+                document.getElementById('editNoHp').value = user.no_hp || '';
+                document.getElementById('editGender').value = user.gender || '';
+                document.getElementById('editAlamat').value = user.alamat || '';
+                if (document.getElementById('editBranch')) {
+                  document.getElementById('editBranch').value = user.office_branch || '';
+                }
+              });
+
+            // Event listener buka modal profile
+            const profileImg = document.getElementById('profileFoto');
+            if (profileImg) {
+              profileImg.addEventListener('click', function () {
+                const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+                profileModal.show();
+              });
+            }
+
+            // Event listener edit profile
+            const editProfileForm = document.getElementById('editProfileForm');
+            if (editProfileForm) {
+              editProfileForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Ambil value form
+                const fullname = document.getElementById('editFullname').value;
+                const email = document.getElementById('editEmail').value;
+                const no_hp = document.getElementById('editNoHp').value;
+                const gender = document.getElementById('editGender').value;
+                const alamat = document.getElementById('editAlamat').value;
+                const office_branch = document.getElementById('editBranch').value;
+                const fotoInput = document.getElementById('editFoto');
+
+                // Ambil value lama dari tampilan profile
+                const oldFullname = document.getElementById('profileFullname').textContent;
+                const oldEmail = document.getElementById('profileEmail').textContent;
+                const oldNoHp = document.getElementById('profileNoHp').textContent;
+                const oldGender = document.getElementById('profileGender').textContent === 'Laki-laki' ? 'L' : (document.getElementById('profileGender').textContent === 'Perempuan' ? 'P' : '');
+                const oldAlamat = document.getElementById('profileAlamat').textContent;
+                const oldBranch = document.getElementById('profileBranch').textContent;
+
+                // Cek apakah ada perubahan (atau upload foto baru)
+                const isChanged =
+                  fullname !== oldFullname ||
+                  email !== oldEmail ||
+                  no_hp !== oldNoHp ||
+                  gender !== oldGender ||
+                  alamat !== oldAlamat ||
+                  office_branch !== oldBranch ||
+                  (fotoInput && fotoInput.files.length > 0);
+
+                if (!isChanged) {
+                  showNotif('Tidak ada perubahan data.', false);
+                  return;
+                }
+
+                // ...lanjutkan PATCH seperti biasa...
+                const token = localStorage.getItem('access_token');
+                const formData = new FormData(this);
+                if (fotoInput && !fotoInput.files.length) {
+                  formData.delete('foto');
+                }
+
+                fetch('http://127.0.0.1:8000/api/me/', {
+                  method: 'PATCH',
+                  headers: { 'Authorization': `Bearer ${token}` },
+                  body: formData
+                })
+                  .then(res => {
+                    if (!res.ok) throw new Error('Gagal update profile');
+                    return res.json();
+                  })
+                  .then(user => {
+                    // Update semua tampilan profile
+                    document.getElementById('userName').textContent = user.fullname || '-';
+                    document.getElementById('profileFullname').textContent = user.fullname || '-';
+                    document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+                    document.getElementById('profileUsername').textContent = user.username || '-';
+                    document.getElementById('profileEmail').textContent = user.email || '-';
+                    document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+                    document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+                    document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+                    document.getElementById('profileAlamat').textContent = user.alamat || '-';
+                    document.getElementById('profileBranch').textContent = user.office_branch || '-';
+                    document.getElementById('profileFoto').src = user.foto_url ? user.foto_url : 'img/default.png';
+
+                    // Tutup modal
+                    const editModalEl = document.getElementById('editProfileModal');
+                    if (editModalEl) {
+                      let editModal = bootstrap.Modal.getInstance(editModalEl);
+                      if (!editModal) {
+                        editModal = new bootstrap.Modal(editModalEl);
+                      }
+                      editModal.hide();
+                    }
+                    showNotif('Profile berhasil diupdate!', true);
+                  })
+                  .catch(err => {
+                    showNotif('Gagal update profile: ' + err.message, false);
+                  });
+              });
+            }
+
+            // Event listener logout di modal profile
+            const logoutBtnModal = document.getElementById('logoutBtnModal');
+            if (logoutBtnModal) {
+              logoutBtnModal.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.removeItem('access_token');
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+              });
+            }
+          });
+      </script>
+
+      <!-- Form Ticket -->
+      <div class="container-fluid py-3">
+        <div class="card shadow">
+          <div class="card-body">
+            <!-- PATCH bagian form ticket -->
+<form id="FormTicket" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label for="judul" class="form-label">Judul Ticket</label>
+    <input type="text" class="form-control" id="judul" name="judul" required>
+  </div>
+  <div class="mb-3">
+    <label for="deskripsi" class="form-label">Deskripsi Masalah</label>
+    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="5" required></textarea>
+  </div>
+  <div class="row">
+    <div class="mb-3 col-md-4">
+      <label for="prioritas" class="form-label">Urgensi</label>
+      <select class="form-select" id="prioritas" name="prioritas" required>
+        <option value="" disabled selected>Pilih urgensi</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </div>
+    <div class="mb-3 col-md-4">
+      <label for="cabang" class="form-label">Kantor Cabang</label>
+      <select class="form-select" id="cabang" name="cabang" required>
+        <option value="" disabled selected>Pilih cabang</option>
+        <option value="jakarta">Head Office Jakarta</option>
+        <option value="bandung">Central Jakarta Office</option>
+        <option value="jakarta_barat">Jakarta Barat</option>
+        <option value="jakarta_utara">Jakarta Utara</option>
+        <option value="medan">Medan Office</option>
+        <option value="surabaya">Surabaya Office</option>
+        <option value="semarang">Semarang Office</option>
+      </select>
+    </div>
+    <div class="mb-3 col-md-4">
+      <label for="jabatan" class="form-label">Jabatan</label>
+      <select class="form-select" id="jabatan" name="jabatan" required>
+        <option value="" disabled selected>Pilih jabatan</option>
+        <option value="staff">Staff</option>
+        <option value="supervisor">Supervisor</option>
+        <option value="manager">Manager</option>
+      </select>
+    </div>
+  </div>
+  <div class="mb-3">
+    <label for="file" class="form-label">Upload Gambar (Opsional)</label>
+    <input class="form-control" type="file" id="file" name="file" accept="image/*">
+    <img id="previewGambar" style="display:none; max-width:200px; margin-top:10px;" />
+  </div>
+  <div class="d-grid">
+    <button type="submit" class="btn">Kirim Ticket</button>
+  </div>
+</form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader SVG -->
+  <div id="loader" class="loader-overlay d-none">
+    <img src="asset/loading.svg" alt="Loading..." class="svg-loader" />
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Custom JS -->
+  <script src="js/dashboard.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
+  <!-- CDN Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/newticket.js"></script>
+  <script>
+  function showNotif(message, success = true) {
+    document.querySelectorAll('.alert-dismissible').forEach(el => el.remove());
+    const notifCard = document.createElement('div');
+    notifCard.className = `alert alert-${success ? 'success' : 'danger'} alert-dismissible fade show position-fixed start-50 translate-middle-x mt-3`;
+    notifCard.style.top = '30px';
+    notifCard.style.left = '50%';
+    notifCard.style.zIndex = 2000;
+    notifCard.style.minWidth = '300px';
+    notifCard.style.maxWidth = '90vw';
+    notifCard.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(notifCard);
+    setTimeout(() => {
+      notifCard.classList.remove('show');
+      notifCard.classList.add('hide');
+      setTimeout(() => notifCard.remove(), 500);
+    }, 3000);
+  }
+  </script>
+</body>
+
+</html>

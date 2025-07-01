@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Navbar + Profile Modal</title>
+  <link rel="icon" href="img/logoweb.png" type="image/png" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar px-3">
+    <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap">
+      <!-- Search -->
+      <form class="d-flex me-3" style="max-width: 300px; width: 100%;" id="searchForm">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchInput" />
+        <button class="btn btn-outline-warning" type="submit">Search</button>
+      </form>
+
+      <!-- Icon & Profile -->
+      <div class="d-flex align-items-center gap-3 flex-shrink-0">
+        <!-- Email -->
+        <a class="nav-link position-relative" id="emailNotifBtn" href="https://mail.google.com" target="_blank">
+          <i class="fas fa-envelope fa-lg" style="color: #dc3545;"></i>
+          <span id="emailNotifBadge"
+            class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none">
+            <span class="visually-hidden">New email</span>
+          </span>
+        </a>
+
+        <!-- Notifikasi -->
+        <a class="nav-link position-relative" href="#" id="notifBell">
+          <i class="fas fa-bell fa-lg" style="color: #0d6efd;"></i>
+          <span id="notifBadge"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+            1
+          </span>
+        </a>
+        <script>
+          function showNotif(message, success = true) {
+            document.getElementById('notifBadge').classList.remove('d-none');
+            const notifCard = document.createElement('div');
+            notifCard.className = `alert alert-${success ? 'success' : 'danger'} alert-dismissible fade show mt-2`;
+            notifCard.innerHTML = `
+              ${message}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.getElementById('notifArea').appendChild(notifCard);
+          }
+          document.getElementById('notifBell').addEventListener('click', () => {
+            document.getElementById('notifBadge').classList.add('d-none');
+          });
+        </script>
+
+        <!-- Nama & Foto -->
+        <div class="d-flex align-items-center">
+          <span class="me-2" id="userName"></span>
+          <img id="profileFoto" src="img/default.png" alt="Profile" class="rounded-circle"
+            style="width: 40px; height: 40px; cursor: pointer;">
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Modal -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">User Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-4">
+            <!-- Profile Picture & Basic Info -->
+            <div class="col-md-4 text-center">
+              <img id="profileFotoModal" src="img/default.png" alt="User Photo" class="img-fluid rounded-circle mb-3"
+                style="width: 150px; height: 150px; object-fit: cover;">
+              <h5 id="profileFullname"></h5>
+              <p class="text-muted" id="profileJabatan"></p>
+              <p>ID: <span id="profileUsername"></span></p>
+            </div>
+            <!-- Detail Info -->
+            <div class="col-md-8">
+              <div class="row">
+                <div class="col-sm-6 mb-3">
+                  <strong>Email:</strong>
+                  <p id="profileEmail"></p>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <strong>Mobile:</strong>
+                  <p id="profileNoHp"></p>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <strong>Gender:</strong>
+                  <p id="profileGender"></p>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <strong>Age:</strong>
+                  <p id="profileUmur"></p>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <strong>Address:</strong>
+                  <p id="profileAlamat"></p>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <strong>Branch:</strong>
+                  <p id="profileBranch"></p>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
+                <button class="btn btn-secondary me-2" id="kelolaAkunBtn">Manage Account</button>
+                <a href="#" class="btn btn-danger" id="logoutBtnModal">Logout</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Profile -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form id="editProfileForm" enctype="multipart/form-data">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Nama lengkap</label>
+                <input type="text" class="form-control" name="fullname" id="editFullname" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" id="editEmail" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Kontak</label>
+                <input type="text" class="form-control" name="no_hp" id="editNoHp">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Gender</label>
+                <select name="gender" class="form-select" id="editGender">
+                  <option value="L">Laki-laki</option>
+                  <option value="P">Perempuan</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Alamat</label>
+                <input type="text" class="form-control" name="alamat" id="editAlamat">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Kantor cabang</label>
+                <input type="text" class="form-control" name="office_branch" id="editBranch">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Upload New Photo</label>
+                <input type="file" class="form-control" name="foto" id="editFoto">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Kelola Akun -->
+  <div class="modal fade" id="kelolaAkunModal" tabindex="-1" aria-labelledby="kelolaAkunModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Kelola Akun</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="manageAccountForm">
+            <div class="mb-3">
+              <label class="form-label">Username Baru</label>
+              <input type="text" class="form-control" name="new_username">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password Baru</label>
+              <input type="password" class="form-control" name="new_password">
+            </div>
+            <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifikasi -->
+  <div id="notifArea" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Show profile modal on click
+      document.getElementById('profileImage').addEventListener('click', function () {
+        const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+        profileModal.show();
+      });
+
+      // Ambil data user login dari backend dan render ke modal profile
+      fetch('http://127.0.0.1:8000/api/me/', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+      })
+        .then(res => res.json())
+        .then user => {
+          document.getElementById('userName').textContent = user.fullname || '-';
+          document.getElementById('profileFullname').textContent = user.fullname || '-';
+          document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+          document.getElementById('profileUsername').textContent = user.username || '-';
+          document.getElementById('profileEmail').textContent = user.email || '-';
+          document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+          document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+          document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+          document.getElementById('profileAlamat').textContent = user.alamat || '-';
+          document.getElementById('profileBranch').textContent = user.office_branch || '-';
+          document.querySelectorAll('#profileFotoModal').forEach(img => {
+            img.src = user.foto_url ? user.foto_url : 'img/default.png';
+          });
+
+          // Isi form edit profile
+          document.getElementById('editFullname').value = user.fullname || '';
+          document.getElementById('editEmail').value = user.email || '';
+          document.getElementById('editNoHp').value = user.no_hp || '';
+          document.getElementById('editGender').value = user.gender || '';
+          document.getElementById('editAlamat').value = user.alamat || '';
+          if (document.getElementById('editBranch')) {
+            document.getElementById('editBranch').value = user.office_branch || '';
+          }
+        });
+
+      // Handler submit edit profile
+      document.getElementById('editProfileForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Ambil value form
+        const fullname = document.getElementById('editFullname').value;
+        const email = document.getElementById('editEmail').value;
+        const no_hp = document.getElementById('editNoHp').value;
+        const gender = document.getElementById('editGender').value;
+        const alamat = document.getElementById('editAlamat').value;
+        const office_branch = document.getElementById('editBranch').value;
+        const fotoInput = document.getElementById('editFoto');
+
+        // Ambil value lama dari tampilan profile
+        const oldFullname = document.getElementById('profileFullname').textContent;
+        const oldEmail = document.getElementById('profileEmail').textContent;
+        const oldNoHp = document.getElementById('profileNoHp').textContent;
+        const oldGender = document.getElementById('profileGender').textContent === 'Laki-laki' ? 'L' : (document.getElementById('profileGender').textContent === 'Perempuan' ? 'P' : '');
+        const oldAlamat = document.getElementById('profileAlamat').textContent;
+        const oldBranch = document.getElementById('profileBranch').textContent;
+
+        // Cek apakah ada perubahan (atau upload foto baru)
+        const isChanged =
+          fullname !== oldFullname ||
+          email !== oldEmail ||
+          no_hp !== oldNoHp ||
+          gender !== oldGender ||
+          alamat !== oldAlamat ||
+          office_branch !== oldBranch ||
+          (fotoInput && fotoInput.files.length > 0);
+
+        if (!isChanged) {
+          showNotif('Tidak ada perubahan data.', false);
+          return;
+        }
+
+        const token = localStorage.getItem('access_token');
+        const formData = new FormData(this);
+        if (fotoInput && !fotoInput.files.length) {
+          formData.delete('foto');
+        }
+
+        fetch('http://127.0.0.1:8000/api/me/', {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        })
+          .then(res => {
+            if (!res.ok) throw new Error('Gagal update profile');
+            return res.json();
+          })
+          .then(user => {
+            // Update semua tampilan profile
+            document.getElementById('userName').textContent = user.fullname || '-';
+            document.getElementById('profileFullname').textContent = user.fullname || '-';
+            document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+            document.getElementById('profileUsername').textContent = user.username || '-';
+            document.getElementById('profileEmail').textContent = user.email || '-';
+            document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+            document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+            document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+            document.getElementById('profileAlamat').textContent = user.alamat || '-';
+            document.getElementById('profileBranch').textContent = user.office_branch || '-';
+            document.querySelectorAll('#profileFotoModal').forEach(img => {
+              img.src = user.foto_url ? user.foto_url : 'img/default.png';
+            });
+
+            // Tutup modal
+            const editModalEl = document.getElementById('editProfileModal');
+            if (editModalEl) {
+              let editModal = bootstrap.Modal.getInstance(editModalEl);
+              if (!editModal) {
+                editModal = new bootstrap.Modal(editModalEl);
+              }
+              editModal.hide();
+            }
+            showNotif('Profile berhasil diupdate!', true);
+          })
+          .catch(err => {
+            showNotif('Gagal update profile: ' + err.message, false);
+          });
+      });
+
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          // Hapus token dari localStorage/sessionStorage
+          localStorage.removeItem('access_token');
+          sessionStorage.clear();
+          // Redirect ke halaman login
+          window.location.href = 'login.html';
+        });
+      }
+
+      // Setelah navbar dimasukkan ke DOM
+      const logoutBtnModal = document.getElementById('logoutBtnModal');
+      if (logoutBtnModal) {
+        logoutBtnModal.addEventListener('click', function (e) {
+          e.preventDefault();
+          localStorage.removeItem('access_token');
+          sessionStorage.clear();
+          window.location.href = 'login.html';
+        });
+      }
+    });
+  </script>
+</body>
+</html>

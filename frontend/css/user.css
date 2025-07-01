@@ -1,0 +1,87 @@
+:root {
+  --warna-bg: #00333A;
+  --warna-bg1: #f5faf9;
+  --warna-primer: #00e1ff;
+  --warna-sekunder: #ffc107;
+  --warna-teks: #212529;
+
+  --font-size-body: 14px;
+  --font-size-title: 18px;
+  --font-size-subtitle: 16px;
+  --font-size-small: 12px;
+  --font-size-sidebar: 14px;
+
+  --font-utama: 'Roboto', 'Open Sans', sans-serif;
+  --font-judul: 'Poppins', sans-serif;
+}
+
+.card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.wrapper {
+  display: flex;
+  /* background:var(--warna-bg1); */
+  background:#f5faf9;
+
+}
+
+
+.main-content {
+  flex-grow: 1;
+ 
+}
+:root {
+  --primary-color: #0d6efd;
+  --primary-dark: #0b5ed7;
+  --light-bg: #f8f9fa;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--light-bg);
+}
+.table-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .tab-button {
+      border: none;
+      background: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      border-bottom: 2px solid #6c63ff;
+      font-weight: bold;
+      color: #6c63ff;
+    }
+
+    .status-active {
+      color: green;
+      font-weight: bold;
+    }
+
+    .status-inactive {
+      color: red;
+      font-weight: bold;
+    }
+
+    .action-btn {
+      background-color: #6c63ff;
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 5px;
+    }
+
+@media (max-width: 576px) {
+  .table-responsive {
+    font-size: 14px;
+  }
+}

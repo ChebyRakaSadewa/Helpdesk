@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "judul": "Maintenance Server",
+    "isi": "Server akan down tanggal 30 Juni pukul 01.00 - 05.00 WIB"
+  },
+  {
+    "id": 2,
+    "judul": "Update Fitur",
+    "isi": "Fitur reset password sudah tersedia di halaman profil."
+  }
+]

@@ -1,0 +1,75 @@
+:root {
+  --warna-bg: #00333A;
+  --warna-bg1: #f5faf9;
+  --warna-primer: #00e1ff;
+  --warna-sekunder: #ffc107;
+  --warna-teks: #212529;
+
+  --font-size-body: 14px;
+  --font-size-title: 18px;
+  --font-size-subtitle: 16px;
+  --font-size-small: 12px;
+  --font-size-sidebar: 14px;
+
+  --font-utama: 'Roboto', 'Open Sans', sans-serif;
+  --font-judul: 'Poppins', sans-serif;
+}
+
+.card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.wrapper {
+  display: flex;
+  /* background:var(--warna-bg1); */
+  background:#f5faf9;
+
+}
+
+
+.main-content {
+  flex-grow: 1;
+ 
+}
+
+.dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .dot.red {
+      background-color: #dc3545;
+    }
+
+    .dot.yellow {
+      background-color: #ffc107;
+    }
+
+    .dot.green {
+      background-color: #198754;
+    }
+
+    .table th,
+    .table td {
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .filter-panel {
+      border-left: 1px solid #ddd;
+      padding-left: 20px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .filter-panel {
+        border-left: none;
+        border-top: 1px solid #ddd;
+        margin-top: 20px;
+        padding-left: 0;
+        padding-top: 20px;
+      }
+    }

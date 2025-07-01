@@ -1,0 +1,149 @@
+:root {
+  --warna-bg: #00e1ff;
+  --warna-bg1: #ffc107;
+  --warna-teks: #212529;
+   --font-size-body: 14px;
+  --font-size-title: 18px;
+  --font-size-subtitle: 16px;
+  --font-size-small: 12px;
+  --font-size-sidebar: 14px;
+
+  --font-utama: 'Inter', sans-serif;:root {
+  --warna-primer: #00e1ff;
+  --warna-sekunder: #ffc107;
+  --warna-teks: #212529;
+
+  --font-utama: 'Roboto', 'Open Sans', sans-serif;
+  --font-judul: 'Poppins', sans-serif;
+}
+
+}
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-utama);
+  padding:0;
+  margin:0;
+}
+
+.wrapper {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  margin:0;
+  background-color: #f5faf9;
+}
+
+.main-content {
+  background-color: #f5faf9;
+  width:100%;
+}
+
+.container  h4{
+  color:#212529;
+  font-size:20px;
+  margin-left:2rem;
+}
+
+
+
+#dateRange {
+      cursor: pointer;
+      background-color: #fff;
+    }
+
+
+
+#content {
+  width: 100%;
+  min-height: 100%;
+  transition: all 0.3s;
+}
+
+#dashboard-cards .card {
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); */
+  border: none;
+  border-radius: 10px;
+}
+.card {
+  border-radius :19px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+}
+
+.card:hover,
+.card:focus,
+.card:active {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+ 
+  
+}
+
+.card-saya{
+  /* background: #9b682a;
+background: linear-gradient(120deg, rgba(155, 104, 42, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%); */
+color:#fff;
+}
+
+
+
+.card-saya:hover {
+  background-color:rgba(255, 193, 7, 0.23);
+}
+
+.card-masuk:hover {
+  background-color:rgb(230, 255, 230);
+}
+
+.card-user:hover {
+  background-color: #e6f7ff;
+   color:#fff;
+}
+
+.card-selesai:hover {
+  background-color: #00e1ff;
+  color:#fff;
+
+}
+
+
+
+
+
+
+ /* Custom scrollbar for sidebar */
+ ::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1e2237;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #4f46e5;
+  border-radius: 10px;
+}
+
+/* Mobile style */
+@media (max-width: 992px) {
+  #sidebar {
+      margin-left: -250px;
+  }
+  #sidebar.active {
+      margin-left: 0;
+  }
+  #sidebarCollapse {
+      display: none;
+  }
+}
+
+@media (min-width: 993px) {
+  #sidebarCollapseMobile {
+      display: none;
+  }
+}
+

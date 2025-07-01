@@ -1,0 +1,188 @@
+:root {
+  --warna-bg: #00333A;
+  --warna-bg1: #f5faf9;
+  --warna-primer: #00e1ff;
+  --warna-sekunder: #ffc107;
+  --warna-teks: #212529;
+
+  --font-size-body: 14px;
+  --font-size-title: 18px;
+  --font-size-subtitle: 16px;
+  --font-size-small: 12px;
+  --font-size-sidebar: 14px;
+
+  --font-utama: 'Roboto', 'Open Sans', sans-serif;
+  --font-judul: 'Poppins', sans-serif;
+}
+
+
+
+
+
+
+
+#sidebarCollapseMobile i {
+  font-size: 18px;
+  background: white;
+}
+
+#sidebar {
+  background-position: center;  
+  transition: all 0.3s;
+  height: 100vh;
+  z-index :1000;
+  font-family: 'Roboto', 'Open Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  background:#fff;
+  
+  
+  
+}
+#sidebar h3{
+  color:#111111;
+  
+  justify-self:center;
+  align-items: center;
+  font-size :15px;
+}
+#sidebar .sidebar-header h2{
+  margin-left :1.2rem;
+  margin-right :6px;
+  color: #ffc107;
+  justify-self:center;
+  align-items: center;
+  font-size :15px;
+  font-family :var(--font-utama);
+}
+#sidebar h2,
+#sidebar h3{
+  font-family:var(--font-utama);
+   font-weight:600;
+   margin-top:12px;
+  
+}
+
+#sidebar img{
+  margin-top:8px;
+  margin-left :1px;
+  height : 25px;
+  width :69px;
+  margin-bottom :0px;
+  justify-self:center;
+  align-items: center;
+}
+
+
+#sidebar .sidebar-header {
+  padding: 15px;
+  color:rgb(29, 29, 29);
+  display: flex;
+  /* justify-self:center; */
+  justify-content: space-between;
+  /* align-items: center; */
+  margin-button :0px;
+  
+}
+
+#sidebar ul.components {
+ flex:1;
+  margin:0;
+  padding: 5px 0;
+  list-style: none;
+  
+}
+
+
+ul.list.components li {
+  margin: 2px 0;           /* Jarak antar item */
+  width: 100%; 
+  margin-top:2px;
+}
+
+#sidebar ul li a {
+  padding: 10px 15px;
+  font-size:1rem ;
+  display: block;
+  color:#212529;
+  text-decoration: none;
+  transition: all 0.3s;
+  list-style: none;
+ border-radius:19px ;
+
+
+}
+#sidebar ul li a:hover {
+  color :#fff;
+  background: #00333A;
+  border-radius:19px ;
+  transform: translateY(-5px); /* Naik ke atas 5px */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Kasih bayangan biar keliatan ngangkat */
+}
+
+#sidebar ul li a i {
+  margin-left:1rem; 
+}
+
+
+
+#sidebarCollapseMobile i {
+  font-size: 18px;
+  background: white;
+}
+
+
+ /* Custom scrollbar for sidebar */
+ ::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1e2237;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #4f46e5;
+  border-radius: 10px;
+}
+
+/* ini untuk dropdown */
+.has-dropdown .dropdown-list {
+  transition: all 0.3s ease;
+}
+
+.has-dropdown a.dropdown-toggle {
+  cursor: pointer;
+}
+.has-dropdown .dropdown-list a {
+  display: block;
+  padding: 6px 0;
+  color: #fff;
+  text-decoration: none;
+}
+
+.has-dropdown .dropdown-list a:hover {
+  text-decoration: underline;
+}
+
+
+
+/* Mobile style */
+@media (max-width: 992px) {
+  #sidebar {
+      margin-left: -250px;
+  }
+  #sidebar.active {
+      margin-left: 0;
+  }
+  #sidebarCollapse {
+      display: none;
+  }
+}
+
+@media (min-width: 993px) {
+  #sidebarCollapseMobile {
+      display: none;
+  }
+}
+

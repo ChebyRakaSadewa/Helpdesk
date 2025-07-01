@@ -1,0 +1,40 @@
+.dot {
+   
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .dot.red {
+      background-color: #dc3545;
+    }
+
+    .dot.yellow {
+      background-color: #ffc107;
+    }
+
+    .dot.green {
+      background-color: #198754;
+    }
+
+    .table th,
+    .table td {
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .filter-panel {
+      border-left: 1px solid #ddd;
+      padding-left: 20px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .filter-panel {
+        border-left: none;
+        border-top: 1px solid #ddd;
+        margin-top: 20px;
+        padding-left: 0;
+        padding-top: 20px;
+      }
+    }

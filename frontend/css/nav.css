@@ -1,0 +1,56 @@
+/* navbar */
+
+:root {
+  --warna-bg: #00333A;
+  --warna-bg1: #f5faf9;
+  --warna-primer: #00e1ff;
+  --warna-sekunder: #ffc107;
+  --warna-teks: #212529;
+
+  --font-size-body: 14px;
+  --font-size-title: 18px;
+  --font-size-subtitle: 16px;
+  --font-size-small: 12px;
+  --font-size-sidebar: 14px;
+
+  --font-utama: 'Roboto', 'Open Sans', sans-serif;
+  --font-judul: 'Poppins', sans-serif;
+}
+
+.navbar {
+  color :black;
+  margin-top:8px;
+  border-radius:19px 0 19px 0;
+  width:100%;
+
+  
+}
+.profile-img {
+      width: 30px;
+      height: 30px;
+      object-fit: cover;
+      border-radius: 50%;
+      
+    }
+
+      @media (max-width: 576px) {
+      .navbar .form-control {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+
+      .navbar .nav-link i {
+        font-size: 16px;
+      }
+
+      .navbar span {
+        font-size: 12px;
+      }
+
+      .profile-img {
+        width: 30px;
+        height: 30px;
+      }
+    }
+    
+/* end */

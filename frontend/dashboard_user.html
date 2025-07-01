@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <title>IT-helpdesk</title>
+  <link rel="icon" href="img/logoweb.png" type="image/png" />
+</head>
+
+<body>
+  <!-- Toggle button buat mobile -->
+  <button id="sidebarCollapseMobile" class="btn d-lg-none">
+    <i class="bi bi-list"></i>
+  </button>
+  <div class="wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar-placeholder"></div>
+    <script>
+      fetch("sidebar_admin.html")
+        .then((res) => res.text())
+        .then((data) => {
+          document.getElementById("sidebar-placeholder").innerHTML = data;
+          document.getElementById('sidebarCollapseMobile')?.addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+          });
+          document.getElementById('sidebarCollapse')?.addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+          });
+        });
+    </script>
+    <!-- akhir sidebar -->
+
+    <div class="main-content">
+      <!-- Navbar -->
+      <div id="navbar-placeholder"></div>
+      <script>
+        fetch("navbar.html")
+          .then((res) => res.text())
+          .then((data) => {
+            document.getElementById("navbar-placeholder").innerHTML = data;
+
+            // Fetch user dan update profil
+            fetch('http://127.0.0.1:8000/api/me/', {
+              headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+            })
+              .then(res => {
+                if (!res.ok) {
+                  showNotif('Gagal mengambil data profile. Silakan login ulang.', false);
+                  throw new Error('Profile fetch failed');
+                }
+                return res.json();
+              })
+              .then(user => {
+                // Update semua elemen foto profil (navbar & modal)
+                document.querySelectorAll('#profileFoto, #profileFotoModal').forEach(img => {
+                  img.src = user.foto_url ? user.foto_url : 'img/default.png';
+                });
+                document.getElementById('userName').textContent = user.fullname || '-';
+                document.getElementById('profileFullname').textContent = user.fullname || '-';
+                document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+                document.getElementById('profileUsername').textContent = user.username || '-';
+                document.getElementById('profileEmail').textContent = user.email || '-';
+                document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+                document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+                document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+                document.getElementById('profileAlamat').textContent = user.alamat || '-';
+                document.getElementById('profileBranch').textContent = user.office_branch || '-';
+
+                // Isi form edit profile
+                document.getElementById('editFullname').value = user.fullname || '';
+                document.getElementById('editEmail').value = user.email || '';
+                document.getElementById('editNoHp').value = user.no_hp || '';
+                document.getElementById('editGender').value = user.gender || '';
+                document.getElementById('editAlamat').value = user.alamat || '';
+                if (document.getElementById('editBranch')) {
+                  document.getElementById('editBranch').value = user.office_branch || '';
+                }
+              });
+
+            // Event listener buka modal profile
+            const profileImg = document.getElementById('profileFoto');
+            if (profileImg) {
+              profileImg.addEventListener('click', function () {
+                const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+                profileModal.show();
+              });
+            }
+
+            // Event listener edit profile
+            const editProfileForm = document.getElementById('editProfileForm');
+            if (editProfileForm) {
+              editProfileForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Ambil value form
+                const fullname = document.getElementById('editFullname').value;
+                const email = document.getElementById('editEmail').value;
+                const no_hp = document.getElementById('editNoHp').value;
+                const gender = document.getElementById('editGender').value;
+                const alamat = document.getElementById('editAlamat').value;
+                const office_branch = document.getElementById('editBranch').value;
+                const fotoInput = document.getElementById('editFoto');
+
+                // Ambil value lama dari tampilan profile
+                const oldFullname = document.getElementById('profileFullname').textContent;
+                const oldEmail = document.getElementById('profileEmail').textContent;
+                const oldNoHp = document.getElementById('profileNoHp').textContent;
+                const oldGender = document.getElementById('profileGender').textContent === 'Laki-laki' ? 'L' : (document.getElementById('profileGender').textContent === 'Perempuan' ? 'P' : '');
+                const oldAlamat = document.getElementById('profileAlamat').textContent;
+                const oldBranch = document.getElementById('profileBranch').textContent;
+
+                // Cek apakah ada perubahan (atau upload foto baru)
+                const isChanged =
+                  fullname !== oldFullname ||
+                  email !== oldEmail ||
+                  no_hp !== oldNoHp ||
+                  gender !== oldGender ||
+                  alamat !== oldAlamat ||
+                  office_branch !== oldBranch ||
+                  (fotoInput && fotoInput.files.length > 0);
+
+                if (!isChanged) {
+                  showNotif('Tidak ada perubahan data.', false);
+                  return;
+                }
+
+                // ...lanjutkan PATCH seperti biasa...
+                const token = localStorage.getItem('access_token');
+                const formData = new FormData(this);
+                if (fotoInput && !fotoInput.files.length) {
+                  formData.delete('foto');
+                }
+
+                fetch('http://127.0.0.1:8000/api/me/', {
+                  method: 'PATCH',
+                  headers: { 'Authorization': `Bearer ${token}` },
+                  body: formData
+                })
+                  .then(res => {
+                    if (!res.ok) throw new Error('Gagal update profile');
+                    return res.json();
+                  })
+                  .then(user => {
+                    // Update semua tampilan profile
+                    document.getElementById('userName').textContent = user.fullname || '-';
+                    document.getElementById('profileFullname').textContent = user.fullname || '-';
+                    document.getElementById('profileJabatan').textContent = user.jabatan || '-';
+                    document.getElementById('profileUsername').textContent = user.username || '-';
+                    document.getElementById('profileEmail').textContent = user.email || '-';
+                    document.getElementById('profileNoHp').textContent = user.no_hp || '-';
+                    document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
+                    document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
+                    document.getElementById('profileAlamat').textContent = user.alamat || '-';
+                    document.getElementById('profileBranch').textContent = user.office_branch || '-';
+                    document.getElementById('profileFoto').src = user.foto_url ? user.foto_url : 'img/default.png';
+
+                    // Tutup modal
+                    const editModalEl = document.getElementById('editProfileModal');
+                    if (editModalEl) {
+                      let editModal = bootstrap.Modal.getInstance(editModalEl);
+                      if (!editModal) {
+                        editModal = new bootstrap.Modal(editModalEl);
+                      }
+                      editModal.hide();
+                    }
+                    showNotif('Profile berhasil diupdate!', true);
+                  })
+                  .catch(err => {
+                    showNotif('Gagal update profile: ' + err.message, false);
+                  });
+              });
+            }
+
+            // Event listener logout di modal profile
+            const logoutBtnModal = document.getElementById('logoutBtnModal');
+            if (logoutBtnModal) {
+              logoutBtnModal.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.removeItem('access_token');
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+              });
+            }
+          });
+      </script>
+      <!-- akhir dari navbar -->
+
+      <!-- Cards -->
+      <section class="container">
+        <div class="row justify-content-center">
+          <h4><i class="bi bi-speedometer2 me-2 mt-3"></i>Dashboard</h4>
+          <div class="row" id="dashboard-cards">
+            <!-- My Ticket -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-1 mt-3 rounded-3">
+              <div class="card card-saya h-100 border-0">
+                <div class="card-body ">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-person-fill me-3" style="color:#ffc107; font-size: 1.8rem;"></i>
+                    <h5 class="card-title mb-0">Tiket Saya</h5>
+                  </div>
+                  <p class="card-text " id="my-ticket-count">0 Tiket</p>
+                </div>
+              </div>
+            </div>
+            <!-- Ticket Masuk -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-1 mt-3">
+              <div class="card card-masuk h-100 border-0">
+                <div class="card-body text-black">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-envelope-fill me-3" style="color: #00ff88; font-size: 1.8rem;"></i>
+                    <h5 class="card-title mb-0">Tiket Masuk</h5>
+                  </div>
+                  <p class="card-text text-muted" id="incoming-ticket-count">0 Tiket</p>
+                </div>
+              </div>
+            </div>
+            <!-- Jumlah User -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-1 mt-3">
+              <div class="card card-user h-100 border-0">
+                <div class="card-body text-black">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-people-fill me-3" style="color: #00e1ff; font-size: 1.8rem;"></i>
+                    <h5 class="card-title mb-0">Jumlah Pengguna</h5>
+                  </div>
+                  <p class="card-text text-muted" id="user-count">0 User</p>
+                </div>
+              </div>
+            </div>
+            <!-- Ticket Selesai -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-1 mt-3">
+              <div class="card card-selesai h-100 border-0">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-check-circle-fill me-3" style="font-size: 1.8rem;"></i>
+                    <h5 class="card-title mb-0">Tiket Selesai</h5>
+                  </div>
+                  <p class="card-text text-muted" id="completed-ticket-count">0 Tiket</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- akhir cards -->
+
+          <div class="row mt-4" style="min-height: 250px; display: flex">
+            <!-- Card Grafik -->
+            <div class="col-lg-8 mb-1">
+              <div class="card shadow-none border-0 rounded-4 p-3" style="background-color: #fff;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="mb-0 text-muted">Statistics ticket</h5>
+                  <div>
+                    <select id="tahunFilter" class="form-select form-select-sm d-inline-block" style="width:auto;"></select>
+                    <select id="bulanFilter" class="form-select form-select-sm d-inline-block" style="width:auto;"></select>
+                    <select id="dayFilter" class="form-select form-select-sm d-inline-block" style="width:auto;"></select>
+                  </div>
+                </div>
+                <div style="height: 220px;">
+                  <canvas id="healthChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <!-- Card Notifikasi pesan -->
+            <div class="col-lg-4 mb-4 d-flex" id="notif-container">
+              <div class="card shadow-none border-0 w-100"
+                style="background-color: #fff; height: 300px; border-radius: 19px;">
+                <div class="card-header bg-white border-0">
+                  <h5 class="mb-0 mt-3 text-muted">Pesan Tiket Masuk</h5>
+                </div>
+                <div class="card-body p-3" style="overflow-y: auto; max-height: 350px; scroll-behavior: smooth;">
+                  <ul class="list-unstyled" id="notif-list">
+                    <!-- Notifikasi akan diisi otomatis lewat JS -->
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <script>
+              document.querySelectorAll('.notif-item').forEach(item => {
+                item.addEventListener('click', () => {
+                  const nama = item.getAttribute('data-nama');
+                  const bagian = item.getAttribute('data-bagian');
+                  const isi = item.getAttribute('data-pesan');
+                  document.getElementById('modalNama').textContent = nama;
+                  document.getElementById('modalBagian').textContent = bagian;
+                  document.getElementById('modalIsi').textContent = isi;
+                });
+              });
+            </script>
+          </div>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+          <script>
+            const ctx = document.getElementById('healthChart').getContext('2d');
+            const allLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let allData = [0,0,0,0,0,0,0,0,0,0,0,0]; // default
+
+            // Fetch statistik dari backend
+            fetch('http://127.0.0.1:8000/api/tiket/statistik/', {
+              headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') }
+            })
+              .then(res => res.json())
+              .then(stats => {
+                // stats: { "Jan": 8, "Feb": 12, ... }
+                allData = allLabels.map(bulan => stats[bulan] || 0);
+                healthChart.data.datasets[0].data = [...allData];
+                healthChart.update();
+              });
+
+            const healthChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: [...allLabels],
+                datasets: [{
+                  label: 'Jumlah Tiket',
+                  data: [...allData],
+                  tension: 0.4,
+                  borderColor: '#2ac39b',
+                  backgroundColor: 'rgba(42, 195, 155, 0.1)',
+                  fill: true,
+                  pointRadius: 0,
+                  pointHoverRadius: 6,
+                  pointHoverBackgroundColor: '#2ac39b'
+                }]
+              },
+              options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { grid: { display: false }, ticks: { color: '#999' } },
+                  y: { grid: { color: '#e0f0eb' }, ticks: { color: '#999' } }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+              }
+            });
+
+            function fetchStatistics() {
+              const tahun = document.getElementById('tahunFilter').value;
+              const bulan = document.getElementById('bulanFilter').value;
+              const day = document.getElementById('dayFilter').value;
+              let group_by = 'bulan';
+              if (day) group_by = 'day';
+              else if (bulan) group_by = 'day';
+              else if (tahun) group_by = 'bulan';
+
+              let url = `http://127.0.0.1:8000/api/tiket/statistik/?group_by=${group_by}`;
+              if (tahun) url += `&tahun=${tahun}`;
+              if (bulan) url += `&bulan=${bulan}`;
+              if (day) url += `&day=${day}`;
+
+              fetch(url, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('access_token') }
+              })
+                .then(res => res.json())
+                .then(stats => {
+                  let labels = [];
+                  let data = [];
+                  if (day) {
+                    // Jika filter hari, tampilkan satu hari saja
+                    labels = ['', String(day), ''];
+                    data = [0, stats[String(day)] || 0, 0];
+                  } else if (group_by === 'day') {
+                    // Jika group by hari, label 1..n sesuai jumlah hari di bulan
+                    let days = 31;
+                    const y = parseInt(tahun) || new Date().getFullYear();
+                    const m = parseInt(bulan);
+                    if (m) days = new Date(y, m, 0).getDate();
+                    labels = [];
+                    data = [];
+                    for (let d = 1; d <= days; d++) {
+                      labels.push(String(d));
+                      data.push(stats[String(d)] || 0); // <-- PATCH di sini
+                    }
+                  } else if (group_by === 'bulan') {
+                    // Jika group by bulan, label Jan..Dec
+                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    data = labels.map(bulan => stats[bulan] || 0);
+                  } else if (group_by === 'tahun') {
+                    // Jika group by tahun, label dari key stats
+                    labels = Object.keys(stats);
+                    data = labels.map(tahun => stats[tahun]);
+                  }
+                  healthChart.data.labels = labels;
+                  healthChart.data.datasets[0].data = data;
+                  healthChart.update();
+                });
+            }
+
+            // Event listener
+            document.getElementById('tahunFilter').addEventListener('change', fetchStatistics);
+            document.getElementById('bulanFilter').addEventListener('change', fetchStatistics);
+            document.getElementById('dayFilter').addEventListener('change', fetchStatistics);
+            fetchStatistics();
+          </script>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Modal Pesan Tiket Masuk -->
+  <div class="modal fade" id="notifModal" tabindex="-1" aria-labelledby="notifModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notifModalLabel">Detail Pesan Tiket Masuk</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <strong>Nama:</strong> <span id="modalNama"></span><br>
+          <strong>Bagian:</strong> <span id="modalBagian"></span><br>
+          <strong>Pesan:</strong>
+          <div id="modalIsi" class="mt-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Komentar -->
+  <hr>
+  <h6>Komentar</h6>
+  <div id="comments-list" style="max-height:150px;overflow-y:auto;"></div>
+  <form id="commentForm" class="mt-2">
+    <div class="input-group">
+      <input type="text" class="form-control" id="commentInput" placeholder="Tulis komentar..." required>
+      <button class="btn btn-primary" type="submit">Kirim</button>
+    </div>
+  </form>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    alert('Sesi login habis. Silakan login ulang.');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Jumlah User
+  fetch('http://127.0.0.1:8000/api/users/', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+    .then(response => response.json())
+    .then(data => {
+      let jumlahUser = 0;
+      if (Array.isArray(data)) {
+        jumlahUser = data.length;
+      } else if (data.results) {
+        jumlahUser = data.results.length;
+      } else if (typeof data.count === "number") {
+        jumlahUser = data.count;
+      }
+      const userCountEl = document.getElementById('user-count');
+      if (userCountEl) {
+        userCountEl.textContent = `${jumlahUser} User`;
+      }
+    });
+
+  // Tiket Saya
+  fetch('http://127.0.0.1:8000/api/tiket/saya/', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+    .then(response => response.json())
+    .then(data => {
+      const jumlahTiketSaya = Array.isArray(data) ? data.length : (data.results ? data.results.length : 0);
+      const myTicketEl = document.getElementById('my-ticket-count');
+      if (myTicketEl) {
+        myTicketEl.textContent = `${jumlahTiketSaya} Tiket`;
+      }
+    });
+
+  // Tiket Masuk
+  fetch('http://127.0.0.1:8000/api/tiket/masuk/', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+    .then(response => response.json())
+    .then(data => {
+      const jumlahTiket = Array.isArray(data) ? data.length : (data.results ? data.results.length : 0);
+      const incomingEl = document.getElementById('incoming-ticket-count');
+      if (incomingEl) {
+        incomingEl.textContent = `${jumlahTiket} Tiket`;
+      }
+    });
+
+  // Tiket Selesai
+  fetch('http://127.0.0.1:8000/api/tiket/selesai/', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+    .then(response => response.json())
+    .then (data => {
+      const jumlahSelesai = Array.isArray(data) ? data.length : (data.results ? data.results.length : 0);
+      const selesaiEl = document.getElementById('completed-ticket-count');
+      if (selesaiEl) {
+        selesaiEl.textContent = `${jumlahSelesai} Tiket`;
+      }
+    });
+
+  // Fetch pesan tiket masuk
+  fetch('http://127.0.0.1:8000/api/tiket/masuk/', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+    .then(response => response.json())
+    .then(data => {
+      const notifList = document.getElementById('notif-list');
+      notifList.innerHTML = ""; // Kosongkan dulu
+      (Array.isArray(data) ? data : data.results || []).forEach(ticket => {
+        const nama = ticket.user?.fullname || "User";
+        const bagian = ticket.user?.jabatan || "-";
+        const pesan = ticket.deskripsi || "";
+        const foto = ticket.user?.foto_url || "img/user1.jpg";
+        const li = document.createElement('li');
+        li.className = "d-flex mb-3 align-items-start notif-item";
+        li.style.cursor = "pointer";
+        li.setAttribute("data-bs-toggle", "modal");
+        li.setAttribute("data-bs-target", "#notifModal");
+        li.setAttribute("data-nama", nama);
+        li.setAttribute("data-bagian", bagian);
+        li.setAttribute("data-pesan", pesan);
+        li.innerHTML = `
+          <img src="${foto}" alt="Foto Pengirim" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover;" />
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-center">
+              <strong class="notif-nama">${nama}</strong>
+              <small class="text-muted notif-bagian">${bagian}</small>
+            </div>
+            <p class="mb-1 text-muted notif-isi">${pesan}</p>
+          </div>
+        `;
+        notifList.appendChild(li);
+      });
+
+      // Re-attach event listener untuk modal
+      document.querySelectorAll('.notif-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const nama = item.getAttribute('data-nama');
+          const bagian = item.getAttribute('data-bagian');
+          const isi = item.getAttribute('data-pesan');
+          document.getElementById('modalNama').textContent = nama;
+          document.getElementById('modalBagian').textContent = bagian;
+          document.getElementById('modalIsi').textContent = isi;
+        });
+      });
+    });
+});
+</script>
+<script>
+  function showNotif(message, success = true) {
+    // Hapus notif lama jika ada
+    document.querySelectorAll('.alert-dismissible').forEach(el => el.remove());
+
+    const notifCard = document.createElement('div');
+    notifCard.className = `alert alert-${success ? 'success' : 'danger'} alert-dismissible fade show position-fixed start-50 translate-middle-x mt-3`;
+    notifCard.style.top = '30px';
+    notifCard.style.left = '50%';
+    notifCard.style.zIndex = 2000;
+    notifCard.style.minWidth = '300px';
+    notifCard.style.maxWidth = '90vw';
+    notifCard.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(notifCard);
+
+    // Auto close after 3 seconds
+    setTimeout(() => {
+      notifCard.classList.remove('show');
+      notifCard.classList.add('hide');
+      setTimeout(() => notifCard.remove(), 500);
+    }, 3000);
+  }
+</script>
+<script>
+// Isi tahun dari 2020 sampai tahun sekarang+1
+const tahunSelect = document.getElementById('tahunFilter');
+const currenttahun = new Date().getFullYear(); // <-- perbaiki di sini
+tahunSelect.innerHTML = '<option value="">All tahuns</option>';
+for (let y = 2020; y <= currenttahun + 1; y++) {
+  tahunSelect.innerHTML += `<option value="${y}">${y}</option>`;
+}
+
+// Isi bulan 1-12 (lengkap)
+const bulanSelect = document.getElementById('bulanFilter');
+const bulanNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+bulanSelect.innerHTML = '<option value="">All bulans</option>';
+for (let m = 1; m <= 12; m++) {
+  bulanSelect.innerHTML += `<option value="${m}">${bulanNames[m-1]}</option>`;
+}
+
+// Isi tanggal 1-31
+const dayselect = document.getElementById('dayFilter');
+function updatedayOptions() {
+  let days = 31;
+  const bulan = parseInt(bulanSelect.value);
+  const tahun = parseInt(tahunSelect.value) || currenttahun;
+  if (bulan) {
+    days = new Date(tahun, bulan, 0).getDate();
+  }
+  dayselect.innerHTML = '<option value="">All days</option>';
+  for (let d = 1; d <= days; d++) {
+    dayselect.innerHTML += `<option value="${d}">${d}</option>`;
+  }
+}
+// Update tanggal setiap kali bulan/tahun berubah
+bulanSelect.addEventListener('change', updatedayOptions);
+tahunSelect.addEventListener('change', updatedayOptions);
+// Panggil sekali saat load
+updatedayOptions();
+</script>
+</html>

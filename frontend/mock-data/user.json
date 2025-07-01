@@ -1,0 +1,11 @@
+{
+  "id": "USR123",
+  "nama": "Ridho Ilahi",
+  "email": "ridho@gmail.com",
+  "phone": "08123456789",
+  "gender": "Laki-laki",
+  "jabatan": "IT Support",
+  "kantor": "Jakarta Pusat",
+  "umur": 24,
+  "foto": "img/bglg.jpg"
+}
