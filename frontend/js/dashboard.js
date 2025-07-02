@@ -103,7 +103,7 @@ function loadPage(page) {
 
 // Tambahkan kode ini di bagian yang sesuai setelah data tiket berhasil diambil
 (Array.isArray(data) ? data : data.results || []).forEach(ticket => {
-  const nama = ticket.user?.fullname || "User";
+  const nama = ticket.user?.nama_lengkap || "User";
   const bagian = ticket.user?.bagian || "-";
   const pesan = ticket.content || "";
   const foto = ticket.user?.foto || "img/user1.jpg";

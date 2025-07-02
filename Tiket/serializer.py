@@ -15,7 +15,7 @@ class TiketSerializer(serializers.ModelSerializer):
         baca_kolom = ['sla', 'waktu_dibuat', 'waktu_diperbarui', 'user']
 
 class KomentarSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source='user.username')
+    user = serializers.ReadOnlyField(source='user.nama_lengkap')
     tiket = serializers.PrimaryKeyRelatedField(queryset=Tiket.objects.all())
 
     class Meta:

@@ -54,25 +54,21 @@
                 document.querySelectorAll('#profileFoto, #profileFotoModal').forEach(img => {
                   img.src = user.foto_url ? user.foto_url : 'img/default.png';
                 });
-                document.getElementById('userName').textContent = user.fullname || '-';
-                document.getElementById('profileFullname').textContent = user.fullname || '-';
+                document.getElementById('userName').textContent = user.nama_lengkap || '-';
+                document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
                 document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-                document.getElementById('profileUsername').textContent = user.username || '-';
                 document.getElementById('profileEmail').textContent = user.email || '-';
                 document.getElementById('profileNoHp').textContent = user.no_hp || '-';
                 document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-                document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-                document.getElementById('profileAlamat').textContent = user.alamat || '-';
-                document.getElementById('profileBranch').textContent = user.office_branch || '-';
+                document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
 
                 // Isi form edit profile
-                document.getElementById('editFullname').value = user.fullname || '';
+                document.getElementById('editnama_lengkap').value = user.nama_lengkap || '';
                 document.getElementById('editEmail').value = user.email || '';
                 document.getElementById('editNoHp').value = user.no_hp || '';
                 document.getElementById('editGender').value = user.gender || '';
-                document.getElementById('editAlamat').value = user.alamat || '';
                 if (document.getElementById('editBranch')) {
-                  document.getElementById('editBranch').value = user.office_branch || '';
+                  document.getElementById('editBranch').value = user.kantor_cabang || '';
                 }
               });
 
@@ -92,30 +88,27 @@
                 e.preventDefault();
 
                 // Ambil value form
-                const fullname = document.getElementById('editFullname').value.trim();
+                const nama_lengkap = document.getElementById('editnama_lengkap').value.trim();
                 const email = document.getElementById('editEmail').value.trim();
                 const no_hp = document.getElementById('editNoHp').value.trim();
                 const gender = document.getElementById('editGender').value;
-                const alamat = document.getElementById('editAlamat').value.trim();
-                const office_branch = document.getElementById('editBranch').value.trim();
+                const kantor_cabang = document.getElementById('editBranch').value.trim();
                 const fotoInput = document.getElementById('editFoto');
 
                 // Ambil value lama dari tampilan profile, SAMAKAN FORMAT
-                const oldFullname = document.getElementById('profileFullname').textContent.trim();
+                const oldnama_lengkap = document.getElementById('profilenama_lengkap').textContent.trim();
                 const oldEmail = document.getElementById('profileEmail').textContent.trim();
                 const oldNoHp = document.getElementById('profileNoHp').textContent.trim();
                 const oldGenderText = document.getElementById('profileGender').textContent.trim();
                 const oldGender = oldGenderText === 'Laki-laki' ? 'L' : (oldGenderText === 'Perempuan' ? 'P' : '');
-                const oldAlamat = document.getElementById('profileAlamat').textContent.trim();
                 const oldBranch = document.getElementById('profileBranch').textContent.trim();
 
                 const isChanged =
-                  fullname !== oldFullname ||
+                  nama_lengkap !== oldnama_lengkap ||
                   email !== oldEmail ||
                   no_hp !== oldNoHp ||
                   gender !== oldGender ||
-                  alamat !== oldAlamat ||
-                  office_branch !== oldBranch ||
+                  kantor_cabang !== oldBranch ||
                   (fotoInput && fotoInput.files.length > 0);
 
                 if (!isChanged) {
@@ -141,16 +134,13 @@
                   })
                   .then(user => {
                     // Update semua tampilan profile
-                    document.getElementById('userName').textContent = user.fullname || '-';
-                    document.getElementById('profileFullname').textContent = user.fullname || '-';
+                    document.getElementById('userName').textContent = user.nama_lengkap || '-';
+                    document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
                     document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-                    document.getElementById('profileUsername').textContent = user.username || '-';
                     document.getElementById('profileEmail').textContent = user.email || '-';
                     document.getElementById('profileNoHp').textContent = user.no_hp || '-';
                     document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-                    document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-                    document.getElementById('profileAlamat').textContent = user.alamat || '-';
-                    document.getElementById('profileBranch').textContent = user.office_branch || '-';
+                    document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
                     document.getElementById('profileFoto').src = user.foto_url ? user.foto_url : 'img/default.png';
 
                     // Tutup modal
@@ -547,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const notifList = document.getElementById('notif-list');
       notifList.innerHTML = ""; // Kosongkan dulu
       (Array.isArray(data) ? data : data.results || []).forEach(ticket => {
-        const nama = ticket.user?.fullname || "User";
+        const nama = ticket.user?.nama_lengkap || "User";
         const bagian = ticket.user?.jabatan || "-";
         const pesan = ticket.deskripsi || "";
         const foto = ticket.user?.foto_url || "img/user1.jpg";

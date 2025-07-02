@@ -39,13 +39,13 @@ class TiketViewset(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         tiket = serializer.save(user=self.request.user)
         from django.contrib.auth import get_user_model
-        User = get_user_model()
+        user = get_user_model()
         admin_emails = User.objects.filter(is_admin=True).values_list('email', flat=True)
         from django.core.mail import send_mail
         from django.conf import settings
         send_mail(
             subject='[Helpdesk] Task Baru Diajukan',
-            message=f"Tiket '{tiket.judul}' telah dibuat oleh {self.request.user.username}.",
+            message=f"Tiket '{tiket.judul}' telah dibuat oleh {self.request.user.nama_lengkap}.",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=list(admin_emails),
             fail_silently=False
@@ -65,7 +65,7 @@ class TiketViewset(viewsets.ModelViewSet):
                 if user_email:
                     send_mail(
                         subject='[Helpdesk] Tiket Anda Telah Dihapus',
-                        message=f"Tiket '{tiket_judul}' telah dihapus oleh {request.user.username}.",
+                        message=f"Tiket '{tiket_judul}' telah dihapus oleh {request.user.nama_lengkap}.",
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         recipient_list=[user_email],
                         fail_silently=False
@@ -82,7 +82,7 @@ class TiketViewset(viewsets.ModelViewSet):
         if user_email:
             send_mail(
                 subject='[Helpdesk] Tiket Anda Telah Dihapus',
-                message=f"Tiket '{tiket_judul}' telah dihapus oleh {request.user.username}.",
+                message=f"Tiket '{tiket_judul}' telah dihapus oleh {request.user.nama_lengkap}.",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user_email],
                 fail_silently=False
@@ -90,7 +90,7 @@ class TiketViewset(viewsets.ModelViewSet):
         admin_emails = tiket.email_admin()
         send_mail(
             subject='[Helpdesk] Tiket Telah Dihapus',
-            message=f"Tiket '{tiket.judul}' telah dihapus oleh {request.user.username}.",
+            message=f"Tiket '{tiket.judul}' telah dihapus oleh {request.user.nama_lengkap}.",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=admin_emails,
             fail_silently=False
@@ -123,7 +123,7 @@ class TiketViewset(viewsets.ModelViewSet):
         if tiket.user and tiket.user.email:
             send_mail(
                 subject='[Helpdesk] Tiket Anda Telah Diedit',
-                message=f"Tiket '{tiket.judul}' telah diperbarui oleh {request.user.username}.",
+                message=f"Tiket '{tiket.judul}' telah diperbarui oleh {request.user.nama_lengkap}.",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[tiket.user.email],
                 fail_silently=False
@@ -158,7 +158,7 @@ class KomentarViewSet(viewsets.ModelViewSet):
             admin_emails = User.objects.filter(is_admin=True).values_list('email', flat=True)
             recipient_email = list(admin_emails)
             subject = f"[Helpdesk] Komentar Baru untuk tiket '{tiket.judul}'"
-            message = f"User {self.request.user.username} mengomentari tiket '{tiket.judul}':\n\n{komentar.isi}"
+            message = f"User {self.request.user.nama_lengkap} mengomentari tiket '{tiket.judul}':\n\n{komentar.isi}"
         send_mail(
             subject,
             message,

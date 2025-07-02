@@ -74,7 +74,6 @@
                 <th>Nama</th>
                 <th>Kontak</th>
                 <th>Email</th>
-                <th>Username</th>
                 <th>Status</th>
                 <th>Operation</th>
                 <th>Action</th>
@@ -100,8 +99,8 @@
           <form id="addUserForm" enctype="multipart/form-data">
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label">Full Name</label>
-                <input type="text" class="form-control" name="fullname" required>
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" class="form-control" name="nama_lengkap" required>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Email</label>
@@ -112,13 +111,9 @@
                 <input type="text" class="form-control" name="no_hp" required>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Address</label>
-                <input type="text" class="form-control" name="alamat">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Office Branch</label>
-                <select class="form-select" name="office_branch">
-                  <option value="">Select Branch</option>
+                <label class="form-label">Kantor Cabang</label>
+                <select class="form-select" name="kantor_cabang">
+                  <option value="">Pilih Kantor Cabang</option>
                   <option value="Jakarta">Jakarta</option>
                   <option value="Bandung">Bandung</option>
                   <option value="Surabaya">Surabaya</option>
@@ -146,10 +141,7 @@
                   <option value="HRD">HRD</option>
                 </select>
               </div>
-              <div class="col-md-6">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" name="username" required>
-              </div>
+              
               <div class="col-md-6">
                 <label class="form-label">Password</label>
                 <input type="password" class="form-control" name="password">
@@ -160,14 +152,6 @@
                   <option value="L">Laki-laki</option>
                   <option value="P">Perempuan</option>
                 </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Date of Birth</label>
-                <input type="date" class="form-control" name="ttl" required>
-              </div>
-              <div class="col">
-                <label class="form-label">Age</label>
-                <input type="text" class="form-control" id="calculated-age" disabled />
               </div>
               <div class="col-md-12">
                 <label class="form-label">Upload Photo</label>
@@ -211,10 +195,9 @@
         tableBody.innerHTML += `
           <tr>
             <td><img class="profile-img" src="${user.foto_url || ''}" alt=""></td>
-            <td>${user.fullname || '-'}</td>
+            <td>${user.nama_lengkap || '-'}</td>
             <td>${user.no_hp || '-'}</td>
             <td>${user.email || '-'}</td>
-            <td>${user.username || '-'}</td>
             <td>
               <span class="${user.is_admin ? 'status-active' : 'status-inactive'}">
                 ${user.is_admin ? 'Admin' : 'User'}
@@ -296,17 +279,14 @@
             .then(res => res.json())
             .then(data => {
               const form = document.getElementById('addUserForm');
-              form.username.value = data.username || '';
               form.email.value = data.email || '';
               form.no_hp.value = data.no_hp || '';
-              form.alamat.value = data.alamat || '';
-              form.office_branch.value = data.office_branch || '';
+              form.kantor_cabang.value = data.kantor_cabang || '';
               form.is_admin.value = data.is_admin ? "true" : "false";
               form.jabatan.value = data.jabatan || '';
               form.password.value = '';
               form.gender.value = data.gender || '';
-              form.ttl.value = data.ttl || '';
-              form.fullname.value = data.fullname || '';
+              form.nama_lengkap.value = data.nama_lengkap || '';
               let hiddenInput = form.querySelector('[name="id"]');
               if (!hiddenInput) {
                 hiddenInput = document.createElement('input');
@@ -355,7 +335,6 @@
             .then(res => res.json())
             .then(data => {
               const html = `
-                <p><strong>Username:</strong> ${data.username}</p>
                 <p><strong>Email:</strong> ${data.email}</p>
                 <p><strong>No HP:</strong> ${data.no_hp}</p>
                 <p><strong>Jabatan:</strong> ${data.jabatan}</p>
@@ -426,7 +405,7 @@
   </script>
 
   <!-- ini buat ngitung umur otomatis bedasarkan pilihan tanggal  -->
-  <script>
+ <!-- <script>
     function calculateAge(ttl) {
       const birthDate = new Date(ttl);
       const today = new Date();
@@ -435,7 +414,7 @@
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-      return age;
+      return age; 
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -449,7 +428,7 @@
         });
       }
     });
-  </script>
+  </script>    -->
 
 
   <!-- Bootstrap 5 JS Bundle with Popper -->
@@ -482,15 +461,13 @@
           }
 
           const exportData = dataToExport.map(user => ({
-            Nama: user.fullname || '',
+            Nama: user.nama_lengkap || '',
             Kontak: user.no_hp || '',
             Email: user.email || '',
-            Username: user.username || '',
             Status: user.is_admin ? 'Admin' : 'User',
             Jabatan: user.jabatan || '',
-            Branch: user.office_branch || '',
+            Branch: user.kantor_cabang || '',
             Gender: user.gender || '',
-            'Tanggal Lahir': user.ttl || ''
           }));
 
           if (exportData.length === 0) {
@@ -523,25 +500,21 @@ fetch("navbar.html")
         document.querySelectorAll('#profileFoto, #profileFotoModal').forEach(img => {
           img.src = user.foto_url ? user.foto_url : 'img/default.png';
         });
-        document.getElementById('userName').textContent = user.fullname || '-';
-        document.getElementById('profileFullname').textContent = user.fullname || '-';
+        document.getElementById('userName').textContent = user.nama_lengkap || '-';
+        document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
         document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-        document.getElementById('profileUsername').textContent = user.username || '-';
         document.getElementById('profileEmail').textContent = user.email || '-';
         document.getElementById('profileNoHp').textContent = user.no_hp || '-';
         document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-        document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-        document.getElementById('profileAlamat').textContent = user.alamat || '-';
-        document.getElementById('profileBranch').textContent = user.office_branch || '-';
+        document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
 
         // Isi form edit profile
-        document.getElementById('editFullname').value = user.fullname || '';
+        document.getElementById('editnama_lengkap').value = user.nama_lengkap || '';
         document.getElementById('editEmail').value = user.email || '';
         document.getElementById('editNoHp').value = user.no_hp || '';
         document.getElementById('editGender').value = user.gender || '';
-        document.getElementById('editAlamat').value = user.alamat || '';
         if (document.getElementById('editBranch')) {
-          document.getElementById('editBranch').value = user.office_branch || '';
+          document.getElementById('editBranch').value = user.kantor_cabang || '';
         }
       });
 
@@ -561,30 +534,27 @@ fetch("navbar.html")
         e.preventDefault();
 
         // Ambil value form
-        const fullname = document.getElementById('editFullname').value;
+        const nama_lengkap = document.getElementById('editnama_lengkap').value;
         const email = document.getElementById('editEmail').value;
         const no_hp = document.getElementById('editNoHp').value;
         const gender = document.getElementById('editGender').value;
-        const alamat = document.getElementById('editAlamat').value;
-        const office_branch = document.getElementById('editBranch').value;
+        const kantor_cabang = document.getElementById('editBranch').value;
         const fotoInput = document.getElementById('editFoto');
 
         // Ambil value lama dari tampilan profile
-        const oldFullname = document.getElementById('profileFullname').textContent;
+        const oldnama_lengkap = document.getElementById('profilenama_lengkap').textContent;
         const oldEmail = document.getElementById('profileEmail').textContent;
         const oldNoHp = document.getElementById('profileNoHp').textContent;
         const oldGender = document.getElementById('profileGender').textContent === 'Laki-laki' ? 'L' : (document.getElementById('profileGender').textContent === 'Perempuan' ? 'P' : '');
-        const oldAlamat = document.getElementById('profileAlamat').textContent;
         const oldBranch = document.getElementById('profileBranch').textContent;
 
         // Cek apakah ada perubahan (atau upload foto baru)
         const isChanged =
-          fullname !== oldFullname ||
+          nama_lengkap !== oldnama_lengkap ||
           email !== oldEmail ||
           no_hp !== oldNoHp ||
           gender !== oldGender ||
-          alamat !== oldAlamat ||
-          office_branch !== oldBranch ||
+          kantor_cabang !== oldBranch ||
           (fotoInput && fotoInput.files.length > 0);
 
         if (!isChanged) {
@@ -610,16 +580,13 @@ fetch("navbar.html")
           })
           .then(user => {
             // Update semua tampilan profile
-            document.getElementById('userName').textContent = user.fullname || '-';
-            document.getElementById('profileFullname').textContent = user.fullname || '-';
+            document.getElementById('userName').textContent = user.nama_lengkap || '-';
+            document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
             document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-            document.getElementById('profileUsername').textContent = user.username || '-';
             document.getElementById('profileEmail').textContent = user.email || '-';
             document.getElementById('profileNoHp').textContent = user.no_hp || '-';
             document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-            document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-            document.getElementById('profileAlamat').textContent = user.alamat || '-';
-            document.getElementById('profileBranch').textContent = user.office_branch || '-';
+            document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
             document.getElementById('profileFoto').src = user.foto_url ? user.foto_url : 'img/default.png';
 
             // Tutup modal

@@ -31,10 +31,10 @@ class CustomLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
         if user is None:
             raise AuthenticationFailed("Kredensial tidak valid")
 
@@ -45,7 +45,7 @@ class CustomLoginView(APIView):
             'access': access_token,
             'user': {
                 'id': user.id,
-                'username': user.username,
+                'nama_lengkap': user.nama_lengkap,
                 'is_admin': user.is_admin,
             }
         })
@@ -56,7 +56,7 @@ class CustomLoginView(APIView):
             httponly=True,
             secure=False,  # Ganti True di produksi (HTTPS)
             samesite='Lax',
-            max_age=7 * 24 * 60 * 60
+            max_age=1 * 24 * 60 * 60
         )
 
         return response

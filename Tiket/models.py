@@ -79,4 +79,4 @@ class Komentar(models.Model):
     waktu_dibuat = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Komentar oleh {self.user.username} pada {self.tiket.judul}"
+        return f"Komentar oleh {self.user.nama_lengkap} pada {self.tiket.judul}"

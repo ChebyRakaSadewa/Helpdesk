@@ -64,25 +64,21 @@
           document.querySelectorAll('#profileFoto, #profileFotoModal').forEach(img => {
             img.src = user.foto_url ? user.foto_url : 'img/default.png';
           });
-          document.getElementById('userName').textContent = user.fullname || '-';
-          document.getElementById('profileFullname').textContent = user.fullname || '-';
+          document.getElementById('userName').textContent = user.nama_lengkap || '-';
+          document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
           document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-          document.getElementById('profileUsername').textContent = user.username || '-';
           document.getElementById('profileEmail').textContent = user.email || '-';
           document.getElementById('profileNoHp').textContent = user.no_hp || '-';
           document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-          document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-          document.getElementById('profileAlamat').textContent = user.alamat || '-';
-          document.getElementById('profileBranch').textContent = user.office_branch || '-';
+          document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
 
           // Isi form edit profile
-          document.getElementById('editFullname').value = user.fullname || '';
+          document.getElementById('editnama_lengkap').value = user.nama_lengkap || '';
           document.getElementById('editEmail').value = user.email || '';
           document.getElementById('editNoHp').value = user.no_hp || '';
           document.getElementById('editGender').value = user.gender || '';
-          document.getElementById('editAlamat').value = user.alamat || '';
           if (document.getElementById('editBranch')) {
-            document.getElementById('editBranch').value = user.office_branch || '';
+            document.getElementById('editBranch').value = user.kantor_cabang || '';
           }
         });
 
@@ -102,30 +98,27 @@
           e.preventDefault();
 
           // Ambil value form
-          const fullname = document.getElementById('editFullname').value;
+          const nama_lengkap = document.getElementById('editnama_lengkap').value;
           const email = document.getElementById('editEmail').value;
           const no_hp = document.getElementById('editNoHp').value;
           const gender = document.getElementById('editGender').value;
-          const alamat = document.getElementById('editAlamat').value;
-          const office_branch = document.getElementById('editBranch').value;
+          const kantor_cabang = document.getElementById('editBranch').value;
           const fotoInput = document.getElementById('editFoto');
 
           // Ambil value lama dari tampilan profile
-          const oldFullname = document.getElementById('profileFullname').textContent;
+          const oldnama_lengkap = document.getElementById('profilenama_lengkap').textContent;
           const oldEmail = document.getElementById('profileEmail').textContent;
           const oldNoHp = document.getElementById('profileNoHp').textContent;
           const oldGender = document.getElementById('profileGender').textContent === 'Laki-laki' ? 'L' : (document.getElementById('profileGender').textContent === 'Perempuan' ? 'P' : '');
-          const oldAlamat = document.getElementById('profileAlamat').textContent;
           const oldBranch = document.getElementById('profileBranch').textContent;
 
           // Cek apakah ada perubahan (atau upload foto baru)
           const isChanged =
-            fullname !== oldFullname ||
+            nama_lengkap !== oldnama_lengkap ||
             email !== oldEmail ||
             no_hp !== oldNoHp ||
             gender !== oldGender ||
-            alamat !== oldAlamat ||
-            office_branch !== oldBranch ||
+            kantor_cabang !== oldBranch ||
             (fotoInput && fotoInput.files.length > 0);
 
           if (!isChanged) {
@@ -151,16 +144,13 @@
             })
             .then(user => {
               // Update semua tampilan profile
-              document.getElementById('userName').textContent = user.fullname || '-';
-              document.getElementById('profileFullname').textContent = user.fullname || '-';
+              document.getElementById('userName').textContent = user.nama_lengkap || '-';
+              document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
               document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-              document.getElementById('profileUsername').textContent = user.username || '-';
               document.getElementById('profileEmail').textContent = user.email || '-';
               document.getElementById('profileNoHp').textContent = user.no_hp || '-';
               document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-              document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-              document.getElementById('profileAlamat').textContent = user.alamat || '-';
-              document.getElementById('profileBranch').textContent = user.office_branch || '-';
+              document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
               document.getElementById('profileFoto').src = user.foto_url ? user.foto_url : 'img/default.png';
 
               // Tutup modal
@@ -383,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <tr>
             <td><input type="checkbox"></td>
             <td>${t.id}</td>
-            <td>${t.user?.fullname || t.user?.username || '-'}</td>
+            <td>${t.user?.nama_lengkap || t.user?.email || '-'}</td>
             <td>${t.judul}</td>
             <td>
               <span class="dot ${t.prioritas === 'high' ? 'red' : t.prioritas === 'medium' ? 'yellow' : 'green'}"></span> ${t.prioritas}
@@ -549,7 +539,7 @@ document.getElementById('filterForm').addEventListener('submit', function(e) {
           <tr>
             <td><input type="checkbox"></td>
             <td>${t.id}</td>
-            <td>${t.user?.fullname || t.user?.username || '-'}</td>
+            <td>${t.user?.nama_lengkap || t.user?.email || '-'}</td>
             <td>${t.judul}</td>
             <td>
               <span class="dot ${t.prioritas === 'high' ? 'red' : t.prioritas === 'medium' ? 'yellow' : 'green'}"></span> ${t.prioritas}

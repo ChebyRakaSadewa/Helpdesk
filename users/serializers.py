@@ -5,25 +5,25 @@ from datetime import date
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
-    age = serializers.SerializerMethodField()
+    # age = serializers.SerializerMethodField()
     foto_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Customuser
         fields = [
-            'id', 'fullname', 'username', 'email', 'password', 'is_admin', 'divisi', 'jabatan',
-            'foto', 'foto_url', 'no_hp', 'alamat', 'office_branch', 'gender', 'ttl', 'age'
+            'id', 'nama_lengkap', 'email', 'password', 'is_admin', 'jabatan',
+            'foto', 'foto_url', 'no_hp', 'kantor_cabang', 'gender'
         ]
         extra_kwargs = {
-            'username': {'validators': []},
             'email': {'required': True},
+            'nama_lengkap': {'required': True},
         }
 
-    def get_age(self, obj):
-        if obj.ttl:
-            today = date.today()
-            return today.year - obj.ttl.year - ((today.month, today.day) < (obj.ttl.month, obj.ttl.day))
-        return None
+    # def get_age(self, obj):
+    #     if obj.ttl:
+    #         today = date.today()
+    #         return today.year - obj.ttl.year - ((today.month, today.day) < (obj.ttl.month, obj.ttl.day))
+    #     return None
 
     def get_foto_url(self, obj):
         request = self.context.get('request')
@@ -31,11 +31,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(obj.foto.url) if request else obj.foto.url
         return ''
 
-    def validate_username(self, value):
-        user = self.instance
-        if Customuser.objects.filter(username=value).exclude(id=user.id if user else None).exists():
-            raise serializers.ValidationError("Username already exists")
-        return value
 
     def validate_email(self, value):
         user = self.instance
@@ -44,25 +39,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        is_admin = validated_data.get('is_admin', False)
+        email = validated_data.get('email')
         user = Customuser.objects.create_user(
-            fullname=validated_data['fullname'],
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
+            username=email,  # username diisi otomatis dengan email
+            email=email,
             password=validated_data['password'],
-            divisi=validated_data.get('divisi', ''),
+            nama_lengkap=validated_data.get('nama_lengkap', ''),
+            is_admin=validated_data.get('is_admin', False),
             jabatan=validated_data.get('jabatan', ''),
             foto=validated_data.get('foto', None),
             no_hp=validated_data.get('no_hp', ''),
-            alamat=validated_data.get('alamat', ''),
-            office_branch=validated_data.get('office_branch', ''),
+            kantor_cabang=validated_data.get('kantor_cabang', ''),
             gender=validated_data.get('gender', ''),
-            ttl=validated_data.get('ttl', None),
         )
-        user.is_admin = is_admin
-        if is_admin:
-            user.is_staff = True
-        user.save()
         return user
 
     def update(self, instance, validated_data):
@@ -75,15 +64,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         return instance
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    email = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(username=data["username"], password=data["password"])
+        user = authenticate(email=data["email"], password=data["password"])
         if user:
             return {
                 "user_id": user.id,
-                "username": user.username,
+                "email": user.email,
                 "is_admin": user.is_admin,
             }
         raise serializers.ValidationError("Invalid Credentials")
@@ -94,8 +83,7 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customuser
         fields = [
-            'id', 'fullname', 'username', 'email', 'is_admin', 'no_hp', 'jabatan', 'foto_url',
-            # tambahkan field lain jika perlu
+            'id', 'nama_lengkap', 'email', 'is_admin', 'no_hp', 'jabatan', 'foto_url',
         ]
 
     def get_foto_url(self, obj):

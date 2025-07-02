@@ -79,7 +79,7 @@
             <div class="col-md-4 text-center">
               <img id="profileFotoModal" src="img/default.png" alt="User Photo" class="img-fluid rounded-circle mb-3"
                 style="width: 150px; height: 150px; object-fit: cover;">
-              <h5 id="profileFullname"></h5>
+              <h5 id="profilenama_lengkap"></h5>
               <p class="text-muted" id="profileJabatan"></p>
               <p>ID: <span id="profileUsername"></span></p>
             </div>
@@ -99,15 +99,7 @@
                   <p id="profileGender"></p>
                 </div>
                 <div class="col-sm-6 mb-3">
-                  <strong>Age:</strong>
-                  <p id="profileUmur"></p>
-                </div>
-                <div class="col-sm-6 mb-3">
-                  <strong>Address:</strong>
-                  <p id="profileAlamat"></p>
-                </div>
-                <div class="col-sm-6 mb-3">
-                  <strong>Branch:</strong>
+                  <strong>Kantor Cabang:</strong>
                   <p id="profileBranch"></p>
                 </div>
               </div>
@@ -136,7 +128,7 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label">Nama lengkap</label>
-                <input type="text" class="form-control" name="fullname" id="editFullname" required>
+                <input type="text" class="form-control" name="nama_lengkap" id="editnama_lengkap" required>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Email</label>
@@ -154,12 +146,8 @@
                 </select>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Alamat</label>
-                <input type="text" class="form-control" name="alamat" id="editAlamat">
-              </div>
-              <div class="col-md-6">
                 <label class="form-label">Kantor cabang</label>
-                <input type="text" class="form-control" name="office_branch" id="editBranch">
+                <input type="text" class="form-control" name="kantor_cabang" id="editBranch">
               </div>
               <div class="col-md-6">
                 <label class="form-label">Upload New Photo</label>
@@ -186,8 +174,8 @@
         <div class="modal-body">
           <form id="manageAccountForm">
             <div class="mb-3">
-              <label class="form-label">Username Baru</label>
-              <input type="text" class="form-control" name="new_username">
+              <label class="form-label">Email Baru</label>
+              <input type="text" class="form-control" name="new_email">
             </div>
             <div class="mb-3">
               <label class="form-label">Password Baru</label>
@@ -220,28 +208,24 @@
       })
         .then(res => res.json())
         .then user => {
-          document.getElementById('userName').textContent = user.fullname || '-';
-          document.getElementById('profileFullname').textContent = user.fullname || '-';
+          document.getElementById('userName').textContent = user.nama_lengkap || '-';
+          document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
           document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-          document.getElementById('profileUsername').textContent = user.username || '-';
           document.getElementById('profileEmail').textContent = user.email || '-';
           document.getElementById('profileNoHp').textContent = user.no_hp || '-';
           document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-          document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-          document.getElementById('profileAlamat').textContent = user.alamat || '-';
-          document.getElementById('profileBranch').textContent = user.office_branch || '-';
+          document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
           document.querySelectorAll('#profileFotoModal').forEach(img => {
             img.src = user.foto_url ? user.foto_url : 'img/default.png';
           });
 
           // Isi form edit profile
-          document.getElementById('editFullname').value = user.fullname || '';
+          document.getElementById('editnama_lengkap').value = user.nama_lengkap || '';
           document.getElementById('editEmail').value = user.email || '';
           document.getElementById('editNoHp').value = user.no_hp || '';
           document.getElementById('editGender').value = user.gender || '';
-          document.getElementById('editAlamat').value = user.alamat || '';
           if (document.getElementById('editBranch')) {
-            document.getElementById('editBranch').value = user.office_branch || '';
+            document.getElementById('editBranch').value = user.kantor_cabang || '';
           }
         });
 
@@ -250,30 +234,27 @@
         e.preventDefault();
 
         // Ambil value form
-        const fullname = document.getElementById('editFullname').value;
+        const nama_lengkap = document.getElementById('editnama_lengkap').value;
         const email = document.getElementById('editEmail').value;
         const no_hp = document.getElementById('editNoHp').value;
         const gender = document.getElementById('editGender').value;
-        const alamat = document.getElementById('editAlamat').value;
-        const office_branch = document.getElementById('editBranch').value;
+        const kantor_cabang = document.getElementById('editBranch').value;
         const fotoInput = document.getElementById('editFoto');
 
         // Ambil value lama dari tampilan profile
-        const oldFullname = document.getElementById('profileFullname').textContent;
+        const oldnama_lengkap = document.getElementById('profilenama_lengkap').textContent;
         const oldEmail = document.getElementById('profileEmail').textContent;
         const oldNoHp = document.getElementById('profileNoHp').textContent;
         const oldGender = document.getElementById('profileGender').textContent === 'Laki-laki' ? 'L' : (document.getElementById('profileGender').textContent === 'Perempuan' ? 'P' : '');
-        const oldAlamat = document.getElementById('profileAlamat').textContent;
         const oldBranch = document.getElementById('profileBranch').textContent;
 
         // Cek apakah ada perubahan (atau upload foto baru)
         const isChanged =
-          fullname !== oldFullname ||
+          nama_lengkap !== oldnama_lengkap ||
           email !== oldEmail ||
           no_hp !== oldNoHp ||
           gender !== oldGender ||
-          alamat !== oldAlamat ||
-          office_branch !== oldBranch ||
+          kantor_cabang !== oldBranch ||
           (fotoInput && fotoInput.files.length > 0);
 
         if (!isChanged) {
@@ -298,16 +279,13 @@
           })
           .then(user => {
             // Update semua tampilan profile
-            document.getElementById('userName').textContent = user.fullname || '-';
-            document.getElementById('profileFullname').textContent = user.fullname || '-';
+            document.getElementById('userName').textContent = user.nama_lengkap || '-';
+            document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
             document.getElementById('profileJabatan').textContent = user.jabatan || '-';
-            document.getElementById('profileUsername').textContent = user.username || '-';
             document.getElementById('profileEmail').textContent = user.email || '-';
             document.getElementById('profileNoHp').textContent = user.no_hp || '-';
             document.getElementById('profileGender').textContent = user.gender === 'L' ? 'Laki-laki' : (user.gender === 'P' ? 'Perempuan' : '-');
-            document.getElementById('profileUmur').textContent = user.age !== null ? user.age + ' tahun' : '-';
-            document.getElementById('profileAlamat').textContent = user.alamat || '-';
-            document.getElementById('profileBranch').textContent = user.office_branch || '-';
+            document.getElementById('profileBranch').textContent = user.kantor_cabang || '-';
             document.querySelectorAll('#profileFotoModal').forEach(img => {
               img.src = user.foto_url ? user.foto_url : 'img/default.png';
             });
