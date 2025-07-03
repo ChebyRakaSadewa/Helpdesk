@@ -202,7 +202,7 @@
                 <strong>Status</strong><br>
                 <div><input type="checkbox" name="status" value="New"> New</div>
                 <div><input type="checkbox" name="status" value="In Progress"> In Progress</div>
-                <div><input type="checkbox" name="status" value="Closed"> Closed</div>
+                <div><input type="checkbox" name="status" value="Completed"> Closed</div>
               </div>
               <div class="mb-2">
                 <strong>Kantor Cabang</strong><br>
@@ -252,7 +252,7 @@ function renderTickets(data) {
   const tbody = document.querySelector('table tbody');
   tbody.innerHTML = '';
   (Array.isArray(data) ? data : data.results || []).forEach(t => {
-    const isClosed = t.status === true || t.status === "Closed";
+    const isClosed = t.status === true || t.status === "Completed";
     tbody.innerHTML += `
       <tr>
         <td><input type="checkbox"></td>
@@ -264,7 +264,7 @@ function renderTickets(data) {
             ${t.prioritas === 'high' ? 'red' : t.prioritas === 'medium' ? 'yellow' : 'green'}"></span>
           ${t.prioritas.charAt(0).toUpperCase() + t.prioritas.slice(1)}
         </td>
-        <td>${t.status ? 'Closed' : 'New'}</td>
+        <td>${t.status ? 'Completed' : 'New'}</td>
         <td>${t.cabang || '-'}</td>
         <td>
           <button class="btn btn-sm btn-success selesai-ticket${isClosed ? ' disabled' : ''}" data-ticket-id="${t.id}" ${isClosed ? 'tabindex="-1" aria-disabled="true"' : ''}>

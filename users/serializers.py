@@ -40,18 +40,23 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         email = validated_data.get('email')
+        is_admin = validated_data.get('is_admin', False)
         user = Customuser.objects.create_user(
             username=email,  # username diisi otomatis dengan email
             email=email,
             password=validated_data['password'],
             nama_lengkap=validated_data.get('nama_lengkap', ''),
-            is_admin=validated_data.get('is_admin', False),
+            is_admin=is_admin,
             jabatan=validated_data.get('jabatan', ''),
             foto=validated_data.get('foto', None),
             no_hp=validated_data.get('no_hp', ''),
             kantor_cabang=validated_data.get('kantor_cabang', ''),
             gender=validated_data.get('gender', ''),
         )
+        if is_admin:
+            user.is_staff = True
+            user.save()
+
         return user
 
     def update(self, instance, validated_data):

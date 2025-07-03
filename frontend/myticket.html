@@ -228,7 +228,7 @@
                                 <strong>Status</strong><br>
                                 <div><input type="checkbox" name="status" value="New"> New</div>
                                 <div><input type="checkbox" name="status" value="In Progress"> In Progress</div>
-                                <div><input type="checkbox" name="status" value="Closed"> Closed</div>
+                                <div><input type="checkbox" name="status" value="Completed"> Closed</div>
                             </div>
 
                             <div class="mb-2">
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>
               <span class="dot ${t.prioritas === 'high' ? 'red' : t.prioritas === 'medium' ? 'yellow' : 'green'}"></span> ${t.prioritas}
             </td>
-            <td>${t.status ? 'Closed' : 'New'}</td>
+            <td>${t.status ? 'Completed' : 'New'}</td>
             <td>${t.cabang}</td>
             <td>
               <i class="fas fa-eye text-info me-2 btn-detail-ticket" data-id="${t.id}" style="cursor:pointer" title="Detail"></i>
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
               document.getElementById('detailTitle').textContent = ticket.judul;
               document.getElementById('detailDescription').textContent = ticket.deskripsi;
               document.getElementById('detailPriority').textContent = ticket.prioritas.charAt(0).toUpperCase() + ticket.prioritas.slice(1);
-              document.getElementById('detailStatus').textContent = ticket.status ? 'Closed' : 'New';
+              document.getElementById('detailStatus').textContent = ticket.status ? 'Completed' : 'New';
               document.getElementById('detailCabang').textContent = ticket.cabang;
               document.getElementById('detailJabatan').textContent = ticket.jabatan;
               const img = document.getElementById('detailFile');
@@ -544,7 +544,7 @@ document.getElementById('filterForm').addEventListener('submit', function(e) {
             <td>
               <span class="dot ${t.prioritas === 'high' ? 'red' : t.prioritas === 'medium' ? 'yellow' : 'green'}"></span> ${t.prioritas}
             </td>
-            <td>${t.status ? 'Closed' : 'New'}</td>
+            <td>${t.status ? 'Completed' : 'New'}</td>
             <td>${t.cabang}</td>
             <td>
               <i class="fas fa-eye text-info me-2 btn-detail-ticket" data-id="${t.id}" style="cursor:pointer" title="Detail"></i>
@@ -597,7 +597,7 @@ document.getElementById('filterForm').addEventListener('submit', function(e) {
               document.getElementById('detailTitle').textContent = ticket.judul;
               document.getElementById('detailDescription').textContent = ticket.deskripsi;
               document.getElementById('detailPriority').textContent = ticket.prioritas.charAt(0).toUpperCase() + ticket.prioritas.slice(1);
-              document.getElementById('detailStatus').textContent = ticket.status ? 'Closed' : 'New';
+              document.getElementById('detailStatus').textContent = ticket.status ? 'Completed' : 'New';
               document.getElementById('detailCabang').textContent = ticket.cabang;
               document.getElementById('detailJabatan').textContent = ticket.jabatan;
               const img = document.getElementById('detailFile');
