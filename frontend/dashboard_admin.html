@@ -675,5 +675,54 @@ document.querySelectorAll('.btn-edit-ticket').forEach(btn => {
       });
   });
 });
+
+fetch('/api/notifications/')
+  .then(response => response.json())
+  .then(data => {
+    const unreadNotifications = data.filter(notification => !notification.is_read);
+
+    const bellIcon = document.getElementById('notifBadge');
+    if (unreadNotifications.length > 0) {
+      bellIcon.textContent = unreadNotifications.length;
+      bellIcon.classList.remove('d-none');
+      bellIcon.classList.add('unread');
+    } else {
+      bellIcon.classList.add('d-none');
+      bellIcon.classList.remove('unread');
+    }
+
+    // Tampilkan notifikasi
+    const notificationsContainer = document.getElementById('notifications-list');
+    notificationsContainer.innerHTML = unreadNotifications.map(notification => 
+      `<div class="notification-item">
+        <p>${notification.message}</p>
+        <button onclick="markAsRead(${notification.id})">Tandai Sudah Dibaca</button>
+      </div>`
+    ).join('');
+  });
+
+// Menandai notifikasi sebagai sudah dibaca
+function markAsRead(notificationId) {
+  fetch(`/api/notifications/${notificationId}/read/`, {
+    method: 'PATCH',
+  })
+  .then(response => {
+    if (response.ok) {
+      document.getElementById(`notification-${notificationId}`).classList.add('read');
+    }
+  });
+}
+
+// Menghapus notifikasi yang sudah dibaca
+function clearNotifications() {
+  fetch('/api/notifications/clear/', {
+    method: 'DELETE',
+  })
+  .then(response => {
+    if (response.ok) {
+      document.getElementById('notifications-list').innerHTML = '';
+    }
+  });
+}
 </script>
 </html>

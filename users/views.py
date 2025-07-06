@@ -107,6 +107,13 @@ class MeView(APIView):
         serializer = RegisterSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            # Tambahkan notifikasi di sini
+            from notifikasi.models import Notification
+            Notification.objects.create(
+                user=user,
+                notification_type='profile_updated',
+                message="Profil Anda berhasil diperbarui."
+            )
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

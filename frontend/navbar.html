@@ -9,6 +9,52 @@
   <link rel="stylesheet" href="css/nav.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    #notifications-list.dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 10px;
+      top: 60px;
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 9999;
+      background: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #notifications-list.dropdown-menu.show {
+      display: block;
+    }
+
+    .notification-item {
+      padding: 10px 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .nav-link.position-relative {
+      position: relative;
+    }
+
+    .notification-item.unread {
+      background: #e7f1ff;
+      border-left: 4px solid #0d6efd;
+    }
+
+    .notification-item.read {
+      background: #fff;
+      border-left: 4px solid transparent;
+    }
+
+    #notifBadge {
+      transition: opacity 0.2s;
+    }
+  </style>
 </head>
 
 <body>
@@ -50,8 +96,15 @@
             `;
             document.getElementById('notifArea').appendChild(notifCard);
           }
-          document.getElementById('notifBell').addEventListener('click', () => {
-            document.getElementById('notifBadge').classList.add('d-none');
+          document.getElementById('notifBell').addEventListener('click', function(e) {
+            e.preventDefault();
+            const notifList = document.getElementById('notifications-list');
+            notifList.classList.toggle('show');
+
+            // Reset badge angka saat bell diklik
+            const bellIcon = document.getElementById('notifBadge');
+            bellIcon.classList.add('d-none');
+            bellIcon.textContent = '';
           });
         </script>
 
@@ -190,6 +243,7 @@
 
   <!-- Notifikasi -->
   <div id="notifArea" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+  <div id="notifications-list" class="dropdown-menu"></div>
 
   <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -207,7 +261,7 @@
         headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
       })
         .then(res => res.json())
-        .then user => {
+        .then(user => {
           document.getElementById('userName').textContent = user.nama_lengkap || '-';
           document.getElementById('profilenama_lengkap').textContent = user.nama_lengkap || '-';
           document.getElementById('profileJabatan').textContent = user.jabatan || '-';
@@ -329,6 +383,113 @@
         });
       }
     });
+
+
+    let unreadCount = 0;
+
+    function renderNotifications() {
+      fetch('http://127.0.0.1:8000/api/notifications/', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+      })
+        .then(response => response.json())
+        .then(data => {
+          const unreadNotifications = data.filter(notification => !notification.is_read);
+          unreadCount = unreadNotifications.length;
+
+          // Update badge
+          const bellIcon = document.getElementById('notifBadge');
+          if (unreadCount > 0) {
+            bellIcon.textContent = unreadCount;
+            bellIcon.classList.remove('d-none');
+            bellIcon.classList.add('unread');
+          } else {
+            bellIcon.classList.add('d-none');
+            bellIcon.classList.remove('unread');
+          }
+
+          // Render notifikasi
+          const notificationsContainer = document.getElementById('notifications-list');
+          notificationsContainer.innerHTML = data.map(notification =>
+            `<div class="notification-item ${notification.is_read ? 'read' : 'unread'}" id="notification-${notification.id}" onclick="showNotificationDetail(${notification.id})">
+    <p>${notification.message}</p>
+  </div>`
+          ).join('');
+        });
+    }
+
+    // Panggil saat load
+    renderNotifications();
+    setInterval(renderNotifications, 15000); // refresh setiap 15 detik
+
+    // Menandai notifikasi sebagai sudah dibaca
+    function markAsRead(notificationId) {
+      fetch(`http://127.0.0.1:8000/api/notifications/${notificationId}/read/`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+      })
+        .then(response => {
+          if (response.ok) {
+            // Update tampilan notif jadi read
+            const notifDiv = document.getElementById(`notification-${notificationId}`);
+            if (notifDiv) {
+              notifDiv.classList.remove('unread');
+              notifDiv.classList.add('read');
+              // Hilangkan tombol "Tandai Sudah Dibaca"
+              const btn = notifDiv.querySelector('button');
+              if (btn) btn.remove();
+            }
+            // Refresh badge
+            renderNotifications();
+          }
+        });
+    }
+
+    // Menghapus notifikasi yang sudah dibaca
+    function clearNotifications() {
+      fetch('http://127.0.0.1:8000/api/notifications/clear/', {
+        method: 'DELETE',
+      })
+        .then(response => {
+          if (response.ok) {
+            document.getElementById('notifications-list').innerHTML = '';
+          }
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+      const notifList = document.getElementById('notifications-list');
+      const bell = document.getElementById('notifBell');
+      if (!notifList.contains(e.target) && !bell.contains(e.target)) {
+        notifList.classList.remove('show');
+      }
+    });
+
+    function showNotificationDetail(notificationId) {
+      fetch(`http://127.0.0.1:8000/api/notifications/${notificationId}/read/`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+      })
+        .then(response => response.ok ? response : Promise.reject())
+        .then(() => {
+          const notifDiv = document.getElementById(`notification-${notificationId}`);
+          if (notifDiv) {
+            notifDiv.classList.remove('unread');
+            notifDiv.classList.add('read');
+          }
+          renderNotifications();
+          fetch(`http://127.0.0.1:8000/api/notifications/`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+          })
+            .then(res => res.json())
+            .then(data => {
+              const notif = data.find(n => n.id === notificationId);
+              if (notif) {
+                alert(notif.message); // Ganti dengan modal jika ingin
+              }
+            });
+        });
+    }
   </script>
 </body>
+
 </html>
