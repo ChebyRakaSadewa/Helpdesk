@@ -13,6 +13,8 @@ from rest_framework import generics, status
 class RegisterView(APIView):
     permission_classes = [IsAuthenticated]
 
+    
+
     def post(self, request):
         if not request.user.is_admin:
             raise PermissionDenied("Hanya admin yang dapat mendaftarkan pengguna baru.")
