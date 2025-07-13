@@ -241,26 +241,11 @@
           <!-- akhir cards -->
 
           <div class="row mt-4" style="min-height: 250px; display: flex">
-            <!-- Card Grafik -->
-            <div class="col-lg-8 mb-1">
-              <div class="card shadow-none border-0 rounded-4 p-3" style="background-color: #fff;">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5 class="mb-0 text-muted">Statistics ticket</h5>
-                  <div>
-                    <select id="tahunFilter" class="form-select form-select-sm d-inline-block" style="width:auto;"></select>
-                    <select id="bulanFilter" class="form-select form-select-sm d-inline-block" style="width:auto;"></select>
-                    <select id="dayFilter" class="form-select form-select-sm d-inline-block" style="width:auto;"></select>
-                  </div>
-                </div>
-                <div style="height: 220px;">
-                  <canvas id="healthChart"></canvas>
-                </div>
-              </div>
-            </div>
+          
             <!-- Card Notifikasi pesan -->
-            <div class="col-lg-4 mb-4 d-flex" id="notif-container">
+            <div class="col-lg-8 mb-4 d-flex" id="notif-container">
               <div class="card shadow-none border-0 w-100"
-                style="background-color: #fff; height: 300px; border-radius: 19px;">
+                style="background-color: #fff; height: 350px; border-radius: 19px;">
                 <div class="card-header bg-white border-0">
                   <h5 class="mb-0 mt-3 text-muted">Pesan Tiket Masuk</h5>
                 </div>
@@ -283,6 +268,24 @@
                 });
               });
             </script>
+              <!-- Card Grafik -->
+            <div class="col-lg-4 mb-1">
+              <div class="card shadow-none border-0 rounded-4 p-3" style="background-color: #fff;">
+                <div class="flex-row justify-content-between align-items-center mb-3">
+                  <header>
+                    <h5 class="mb-2 text-muted">Statistics ticket</h5>
+                  </header>
+                  <div style="display: flex; width: 50px; display: flex-row;">
+                    <select id="tahunFilter" class="form-select form-select-sm d-inline-block" style="width:auto; margin-right: 7px;"></select>
+                    <select id="bulanFilter" class="form-select form-select-sm d-inline-block" style="width:auto; margin-right: 7px;"></select>
+                    <select id="dayFilter" class="form-select form-select-sm d-inline-block" style="width:auto;"></select>
+                  </div>
+                </div>
+                <div style="height: 250px;">
+                  <canvas id="healthChart"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
           <script>
@@ -616,7 +619,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Isi tahun dari 2020 sampai tahun sekarang+1
 const tahunSelect = document.getElementById('tahunFilter');
 const currenttahun = new Date().getFullYear(); // <-- perbaiki di sini
-tahunSelect.innerHTML = '<option value="">Semua Tahun</option>';
+tahunSelect.innerHTML = '<option value="">Tahun</option>';
 for (let y = 2020; y <= currenttahun + 1; y++) {
   tahunSelect.innerHTML += `<option value="${y}">${y}</option>`;
 }
@@ -627,7 +630,7 @@ const bulanNames = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
-bulanSelect.innerHTML = '<option value="">Semua Bulan</option>';
+bulanSelect.innerHTML = '<option value="">Bulan</option>';
 for (let m = 1; m <= 12; m++) {
   bulanSelect.innerHTML += `<option value="${m}">${bulanNames[m-1]}</option>`;
 }
@@ -641,7 +644,7 @@ function updatedayOptions() {
   if (bulan) {
     days = new Date(tahun, bulan, 0).getDate();
   }
-  dayselect.innerHTML = '<option value="">Semua Tanggal</option>';
+  dayselect.innerHTML = '<option value="">Tanggal</option>';
   for (let d = 1; d <= days; d++) {
     dayselect.innerHTML += `<option value="${d}">${d}</option>`;
   }

@@ -26,7 +26,16 @@
   .login-container h3 {
     color :white;
   }
+  .login-container h2{
+    color:warning;
+  }
 
+  img{
+    margin-top: 12px;
+    margin-left:13px;
+    position: relative;
+  }
+ 
   .loader-overlay {
   position: fixed;
   top: 0;
