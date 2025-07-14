@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'Tiket',
     'users',
+    'notifikasi.apps.NotifikasiConfig',
     'rest_framework_simplejwt.token_blacklist',
 ]
 

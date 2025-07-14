@@ -19,7 +19,11 @@ class Tiket(models.Model):
     sla = models.DateTimeField(null=True, blank=True)
     waktu_dibuat = models.DateTimeField(auto_now_add=True)
     waktu_diperbarui = models.DateTimeField(auto_now=True)
-    status = models.BooleanField(default=False)  # False = open, True = selesai
+    status = models.CharField(
+        max_length=50,
+        choices=[('new', 'New'), ('in_progress', 'In Progress'), ('completed', 'Completed')],
+        default='new'
+    )
     file = models.FileField(upload_to='unggahan/', blank=True, null=True)
     cabang = models.CharField(max_length=100, default='-')
     jabatan = models.CharField(max_length=100, default='-')
@@ -79,4 +83,4 @@ class Komentar(models.Model):
     waktu_dibuat = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Komentar oleh {self.user.username} pada {self.tiket.judul}"
+        return f"Komentar oleh {self.user.nama_lengkap} pada {self.tiket.judul}"

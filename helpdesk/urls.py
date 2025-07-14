@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('Tiket.urls')),
     path('api/', include('users.urls')),
+    path('api/', include('notifikasi.urls')),  # <--- ini WAJIB ADA
 ]
 
 if settings.DEBUG:

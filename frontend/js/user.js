@@ -12,10 +12,9 @@ function renderUsers(users) {
     tableBody.innerHTML += `
       <tr>
         <td><img class="profile-img" src="${user.foto_url || ''}" alt=""></td>
-        <td>${user.fullname || '-'}</td>
+        <td>${user.nama_lengkap || '-'}</td>
         <td>${user.no_hp || '-'}</td>
         <td>${user.email || '-'}</td>
-        <td>${user.username || '-'}</td>
         <td>
           <span class="${user.is_admin ? 'status-active' : 'status-inactive'}">
             ${user.is_admin ? 'Admin' : 'User'}
@@ -139,17 +138,14 @@ function addEventListeners() {
         .then(res => res.json())
         .then(data => {
           const form = document.getElementById('addUserForm');
-          form.fullname.value = data.fullname || '';
-          form.username.value = data.username || '';
+          form.nama_lengkap.value = data.nama_lengkap || '';
           form.email.value = data.email || '';
           form.no_hp.value = data.no_hp || '';
-          form.alamat.value = data.alamat || '';
-          form.office_branch.value = data.office_branch || '';
+          form.kantor_cabang.value = data.kantor_cabang || '';
           form.is_admin.value = data.is_admin ? "true" : "false";
           form.jabatan.value = data.jabatan || '';
           form.password.value = '';
           form.gender.value = data.gender || '';
-          form.ttl.value = data.ttl || '';
           let hiddenInput = form.querySelector('[name="id"]');
           if (!hiddenInput) {
             hiddenInput = document.createElement('input');
@@ -195,7 +191,6 @@ function addEventListeners() {
         .then(res => res.json())
         .then(data => {
           const html = `
-            <p><strong>Username:</strong> ${data.username}</p>
             <p><strong>Email:</strong> ${data.email}</p>
             <p><strong>No HP:</strong> ${data.no_hp}</p>
             <p><strong>Jabatan:</strong> ${data.jabatan}</p>

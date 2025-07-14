@@ -47,15 +47,15 @@ document.addEventListener('DOMContentLoaded', function () {
       let data;
       let errorMsg = "Gagal kirim ticket";
 
-      // Coba parse JSON, jika gagal fallback ke text
+      // Coba parse JSON, jika gagal tampilkan pesan error umum
       try {
         data = await res.json();
       } catch {
-        data = await res.text();
+        data = null;
       }
 
       if (!res.ok) {
-        errorMsg += ": " + (typeof data === "string" ? data : JSON.stringify(data));
+        errorMsg += data && data.detail ? ": " + data.detail : "";
         throw new Error(errorMsg);
       }
 

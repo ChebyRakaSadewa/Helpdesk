@@ -1,7 +1,7 @@
 document.getElementById('loginForm').addEventListener('submit', function (e) {
   e.preventDefault();
 
-  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
   const message = document.getElementById('message');
 
@@ -12,7 +12,7 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username: username,
+      email: email,
       password: password
     })
   })
@@ -20,7 +20,7 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
     if (!response.ok) {
       // Ambil error message dari response JSON jika ada
       const errorData = await response.json();
-      throw new Error(errorData.detail || "Username atau password salah");
+      throw new Error(errorData.detail || "Email atau Password salah");
     }
     return response.json();
   })

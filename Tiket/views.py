@@ -39,13 +39,11 @@ class TiketViewset(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         tiket = serializer.save(user=self.request.user)
         from django.contrib.auth import get_user_model
-        User = get_user_model()
+        User = get_user_model()  # <-- perbaiki di sini
         admin_emails = User.objects.filter(is_admin=True).values_list('email', flat=True)
-        from django.core.mail import send_mail
-        from django.conf import settings
         send_mail(
             subject='[Helpdesk] Task Baru Diajukan',
-            message=f"Tiket '{tiket.judul}' telah dibuat oleh {self.request.user.username}.",
+            message=f"Tiket '{tiket.judul}' telah dibuat oleh {self.request.user.nama_lengkap}.",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=list(admin_emails),
             fail_silently=False
@@ -55,55 +53,43 @@ class TiketViewset(viewsets.ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-        # (isi sama persis dengan hapus_data)
         tiket = self.get_object()
         if request.user.is_admin:
-            if tiket.status or (tiket.sla and tiket.sla < now()):
+            if tiket.status == 'completed' or (tiket.sla and tiket.sla < now()):
                 user_email = tiket.user.email if tiket.user and tiket.user.email else None
                 tiket_judul = tiket.judul
                 response = super().destroy(request, *args, **kwargs)
                 if user_email:
                     send_mail(
                         subject='[Helpdesk] Tiket Anda Telah Dihapus',
-                        message=f"Tiket '{tiket_judul}' telah dihapus oleh {request.user.username}.",
+                        message=f"Tiket '{tiket_judul}' telah dihapus oleh {request.user.nama_lengkap}.",
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         recipient_list=[user_email],
                         fail_silently=False
                     )
+                admin_emails = tiket.email_admin()
+                send_mail(
+                    subject='[Helpdesk] Tiket Telah Dihapus',
+                    message=f"Tiket '{tiket.judul}' telah dihapus oleh {request.user.nama_lengkap}.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=admin_emails,
+                    fail_silently=False
+                )
                 return response
-            return Response(
-                {"detail": "Admin hanya bisa hapus task yang sudah selesai atau sudah expired."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            else:
+                return Response(
+                    {"detail": "Admin hanya bisa hapus task yang sudah selesai atau sudah expired."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
         # User biasa bisa hapus tiket sendiri
-        user_email = tiket.user.email if tiket.user and tiket.user.email else None
-        tiket_judul = tiket.judul
-        response = super().destroy(request, *args, **kwargs)
-        if user_email:
-            send_mail(
-                subject='[Helpdesk] Tiket Anda Telah Dihapus',
-                message=f"Tiket '{tiket_judul}' telah dihapus oleh {request.user.username}.",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user_email],
-                fail_silently=False
-            )
-        admin_emails = tiket.email_admin()
-        send_mail(
-            subject='[Helpdesk] Tiket Telah Dihapus',
-            message=f"Tiket '{tiket.judul}' telah dihapus oleh {request.user.username}.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=admin_emails,
-            fail_silently=False
-        )
-        return response
-
+    
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def confirm_complete(self, request, pk=None):
-        # Admin menandai tiket sebagai selesai
         tiket = self.get_object()
-        if tiket.status:
+        if tiket.status == 'completed':
             return Response({"detail": "Task sudah selesai sebelumnya"}, status=status.HTTP_400_BAD_REQUEST)
-        tiket.status = True
+        tiket.status = 'completed'
         tiket.save()
         # Notifikasi ke user
         if tiket.user and tiket.user.email:
@@ -123,7 +109,7 @@ class TiketViewset(viewsets.ModelViewSet):
         if tiket.user and tiket.user.email:
             send_mail(
                 subject='[Helpdesk] Tiket Anda Telah Diedit',
-                message=f"Tiket '{tiket.judul}' telah diperbarui oleh {request.user.username}.",
+                message=f"Tiket '{tiket.judul}' telah diperbarui oleh {request.user.nama_lengkap}.",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[tiket.user.email],
                 fail_silently=False
@@ -158,7 +144,7 @@ class KomentarViewSet(viewsets.ModelViewSet):
             admin_emails = User.objects.filter(is_admin=True).values_list('email', flat=True)
             recipient_email = list(admin_emails)
             subject = f"[Helpdesk] Komentar Baru untuk tiket '{tiket.judul}'"
-            message = f"User {self.request.user.username} mengomentari tiket '{tiket.judul}':\n\n{komentar.isi}"
+            message = f"User {self.request.user.nama_lengkap} mengomentari tiket '{tiket.judul}':\n\n{komentar.isi}"
         send_mail(
             subject,
             message,
@@ -170,8 +156,8 @@ class KomentarViewSet(viewsets.ModelViewSet):
 # --- Tiket Masuk View ---
 class TiketMasukView(APIView):
     def get(self, request):
-        # Ambil semua tiket yang belum selesai (status=False)
-        tiket = Tiket.objects.filter(status=False)
+        # Ambil semua tiket yang statusnya 'new'
+        tiket = Tiket.objects.filter(status='new')
         serializer = TiketSerializer(tiket, many=True)
         return Response(serializer.data)
 
@@ -187,7 +173,7 @@ class TiketSayaView(APIView):
             tiket = tiket.filter(prioritas__in=prioritas)
         status_list = request.GET.getlist('status')
         if status_list:
-            status_map = {'New': False, 'Closed': True, 'In Progress': None}
+            status_map = {'New': 'new', 'In Progress': 'in_progress', 'Completed': 'completed'}
             status_values = [status_map.get(s) for s in status_list if s in status_map]
             tiket = tiket.filter(status__in=status_values)
         kantor = request.GET.getlist('kantor')
@@ -204,8 +190,8 @@ class TiketSelesaiView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Ambil semua tiket yang sudah selesai (status=True)
-        tiket = Tiket.objects.filter(status=True)
+        # Ambil semua tiket yang sudah selesai (status='completed')
+        tiket = Tiket.objects.filter(status='completed')
         serializer = TiketSerializer(tiket, many=True)
         return Response(serializer.data)
 
