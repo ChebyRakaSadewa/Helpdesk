@@ -9,6 +9,11 @@
   <link rel="stylesheet" href="css/nav.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  
+
   <style>
     #notifications-list.dropdown-menu {
       display: none;
@@ -55,6 +60,7 @@
       transition: opacity 0.2s;
     }
   </style>
+
 </head>
 
 <body>
@@ -76,6 +82,130 @@
             <span class="visually-hidden">New email</span>
           </span>
         </a>
+<!-- Bell Notif -->
+<div class="position-relative" id="notifWrapper" style="position: relative;">
+  <a href="#" id="notifBell" class="nav-link position-relative text-decoration-none">
+    <i id="notifIcon" class="fas fa-bell fa-lg text-primary"></i>
+    <span id="notifBadge"
+      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+  </a>
+
+  <!-- CARD BUKAN DROPDOWN -->
+  <div id="notifCard" class="card shadow"
+    style="display: none; position: absolute; top: 120%; right: 0; width: 350px; z-index: 999;">
+    <div class="card-header bg-primary text-white fw-bold">Notifikasi</div>
+    <ul class="list-group list-group-flush" id="notifList"></ul>
+    <div id="notifEmpty" class="text-center text-muted p-3">Tidak ada notifikasi</div>
+  </div>
+</div>
+
+<!-- Modal Detail -->
+<div class="modal fade" id="notifModal" tabindex="-1" aria-labelledby="notifModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notifModalLabel">Detail Notifikasi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body" id="notifContent">
+        <!-- Isi detail -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const pesanBaru = [
+    { id: 1, judul: 'Data user diupdate', isi: 'User ID #101 berhasil diupdate oleh admin.' },
+    { id: 2, judul: 'Pengajuan cuti diterima', isi: 'Cuti kamu dari 10-12 Juli sudah disetujui oleh HR.' },
+    { id: 3, judul: 'Tambah data produk', isi: 'Produk baru "Sepatu Running" sudah ditambahkan.' }
+  ];
+
+  const notifBell = document.getElementById('notifBell');
+  const notifCard = document.getElementById('notifCard');
+  const notifList = document.getElementById('notifList');
+  const notifEmpty = document.getElementById('notifEmpty');
+  const notifBadge = document.getElementById('notifBadge');
+  const notifIcon = document.getElementById('notifIcon');
+  const notifModal = new bootstrap.Modal(document.getElementById('notifModal'));
+  const notifContent = document.getElementById('notifContent');
+
+  function updateNotifStatus() {
+    const count = pesanBaru.length;
+    if (count > 0) {
+      notifBadge.textContent = count;
+      notifBadge.classList.remove('d-none');
+      notifIcon.classList.remove('text-primary');
+      notifIcon.classList.add('text-danger');
+    } else {
+      notifBadge.classList.add('d-none');
+      notifIcon.classList.remove('text-danger');
+      notifIcon.classList.add('text-primary');
+    }
+  }
+
+  function renderNotifList() {
+    notifList.innerHTML = '';
+    if (pesanBaru.length === 0) {
+      notifEmpty.style.display = 'block';
+      notifList.style.display = 'none';
+      return;
+    }
+
+    notifEmpty.style.display = 'none';
+    notifList.style.display = 'block';
+
+    pesanBaru.forEach(pesan => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item list-group-item-action';
+      li.style.cursor = 'pointer';
+
+      li.innerHTML = `
+        <div class="fw-bold">${pesan.judul}</div>
+        <small class="text-muted">${pesan.isi.length > 50 ? pesan.isi.substring(0, 50) + '...' : pesan.isi}</small>
+      `;
+
+      li.addEventListener('click', () => {
+        notifModal.show();
+        document.getElementById('notifModalLabel').textContent = pesan.judul;
+        notifContent.textContent = pesan.isi;
+        notifCard.style.display = 'none';
+      });
+
+      notifList.appendChild(li);
+    });
+  }
+
+  notifBell.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (notifCard.style.display === 'none') {
+      renderNotifList();
+      notifCard.style.display = 'block';
+    } else {
+      notifCard.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const notifWrapper = document.getElementById('notifWrapper');
+    if (!notifWrapper.contains(e.target)) {
+      notifCard.style.display = 'none';
+    }
+  });
+
+  updateNotifStatus();
+});
+</script>
+
+
+
+
+
 
         <!-- Notifikasi -->
         <a class="nav-link position-relative" href="#" id="notifBell">
@@ -107,6 +237,7 @@
             bellIcon.textContent = '';
           });
         </script>
+
 
         <!-- Nama & Foto -->
         <div class="d-flex align-items-center">
